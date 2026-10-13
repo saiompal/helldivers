@@ -3,63 +3,122 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-// Rebuilds the Level 1 maze from the text map below.
-// Run it from the menu: Tools > Level 1 > Build Maze From Layout.
-// Edit the map, run it again, then save the scene.
+// Rebuilds Level 1 from the text map below: opens the scene, lays out the
+// side-on map, sets up the player's movement and circle of light, the map
+// flip and the HUD, then saves. Edit the map and run it again.
+//
+// The map is seen from the side and gravity pulls down the screen. The
+// tall wall in the middle can't be jumped, but its gap at the top is at
+// floor level once the map flips.
+// Run it from the menu: Tools > Level 1 > Build Level 1.
 public static class Level1Builder
 {
-    // # wall   . floor   S player start   E exit   L lantern   X spike trap
-    // Each character is one world unit. S, E and L are placed at the
-    // centre of all tiles that use that letter.
+    internal const string ScenePath = "Assets/Scenes/Level1.unity";
+
+    // # wall   . open space   S player start   E exit   * star
+    // Row 0 is the top. Each character is one world unit. S and E are
+    // placed at the centre of all tiles with that letter; each touching
+    // group of * is one star. The player can jump about 3 tiles high.
     private static readonly string[] Layout =
     {
         "##################################",
-        "#.....#...........#............EE#",
-        "#.....#...........#............EE#",
-        "#..#..#..#######..#..####..####..#",
-        "#..#..#.....#.....#.....#..#..#..#",
-        "#..#..#.....#.....#.....#..#..#..#",
-        "#..#..####..#..#######..#..#..#..#",
-        "#..#........#...........#..#.....#",
-        "#..#........#...........#..#.....#",
-        "#..############################.X#",
-        "#.....X.....X.....X.....X........#",
-        "#........X.....X.....X.....X.....#",
-        "#..###############################",
-        "#..#........#..#.................#",
-        "#..#........#..#.................#",
-        "#..#..#..#..#..#..#..#..#######..#",
-        "#SS...#..#........#..#LL#........#",
-        "#SS...#..#........#..#LL#........#",
+        "#................................#",
+        "#................................#",
+        "#...............#................#",
+        "#...............#................#",
+        "#...............#........*.......#",
+        "#...............#.....#######....#",
+        "#...............#................#",
+        "#...............#................#",
+        "#...........#####................#",
+        "#...............#................#",
+        "#.......*.......#..........####..#",
+        "#......####.....#................#",
+        "#...............#.....####.......#",
+        "#...............#................#",
+        "#.........###...#................#",
+        "#.....#...###...#.....###.....EE.#",
+        "#SS...#...###...#.....###.....EE.#",
         "##################################",
     };
 
-    private const float PreviewSeconds = 10f;
+    private const string StarSpritePath = "Assets/Art/Star.png";
+    private const string PlayerMaterialPath = "Assets/Physics/PlayerNoFriction.physicsMaterial2D";
+
+    private const float PreviewSeconds = 5f;
+    private const float RevealSeconds = 2f;
+    private const int RevealCharges = 3;
+    private const float SecondsBetweenFlips = 8f;
+    private const float FlipWarningSeconds = 2f;
+
+    // The circle the player can see in the dark, in world units.
+    private const float VisionInnerRadius = 0.5f;
+    private const float VisionOuterRadius = 2f;
+
+    // Player physics. Jump speed 14 with gravity scale 3 rises about 3.3
+    // units, enough for a 3-tile ledge but not 4.
+    private const float PlayerGravityScale = 3f;
+    private const float PlayerMoveSpeed = 6f;
+    private const float PlayerJumpSpeed = 14f;
+    private const float PlayerBoxSize = 0.55f;
+
+    private static readonly Vector2 ExitSize = new Vector2(1.4f, 2f);
+
+    // Orthographic size once the camera zooms in on the player.
+    private const float FollowCameraSize = 4f;
 
     private static readonly Color DefaultWallColor = new Color(0.83f, 0.83f, 0.83f);
-    private static readonly Color SpikeColor = new Color(0.8f, 0.12f, 0.1f);
-    private static readonly Color LanternColor = new Color(1f, 0.85f, 0.3f);
+    private static readonly Color VisionColor = new Color(1f, 0.95f, 0.85f);
+    private static readonly Color StarGlowColor = new Color(1f, 0.82f, 0.3f);
 
-    [MenuItem("Tools/Level 1/Build Maze From Layout")]
-    private static void Build()
+    [MenuItem("Tools/Level 1/Build Level 1")]
+    private static void BuildMenuItem()
     {
+        if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            Build();
+        }
+    }
+
+    internal static bool Build()
+    {
+        Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+
         GameObject floor = GameObject.Find("Floor");
         GameObject walls = GameObject.Find("Walls");
         GameObject player = GameObject.Find("Player");
-        GameObject exit = GameObject.Find("Exit");
+        ExitTrigger exitTrigger = Object.FindAnyObjectByType<ExitTrigger>();
+        GameObject exit = exitTrigger != null ? exitTrigger.gameObject : null;
         Camera camera = Camera.main;
         GameManager gameManager = Object.FindAnyObjectByType<GameManager>();
+        Sprite starSprite = AssetDatabase.LoadAssetAtPath<Sprite>(StarSpritePath);
 
         if (floor == null || walls == null || player == null ||
             exit == null || camera == null || gameManager == null)
         {
             Debug.LogError(
-                "Level1Builder: open the Level1 scene first. It needs Floor, " +
-                "Walls, Player, Exit, Main Camera and GameManager objects."
+                $"Level1Builder: {ScenePath} needs Floor, Walls, Player, an ExitTrigger, " +
+                "Main Camera and GameManager objects."
             );
-            return;
+            return false;
+        }
+
+        if (starSprite == null)
+        {
+            Debug.LogError($"Level1Builder: no sprite found at {StarSpritePath}.");
+            return false;
+        }
+
+        int width = Layout[0].Length;
+        int height = Layout.Length;
+
+        if (Layout.Any(row => row.Length != width))
+        {
+            Debug.LogError("Level1Builder: every layout row must be the same length.");
+            return false;
         }
 
         SpriteRenderer floorRenderer = floor.GetComponent<SpriteRenderer>();
@@ -73,23 +132,27 @@ public static class Level1Builder
             wallColor = existingWall.color;
         }
 
-        int width = Layout[0].Length;
-        int height = Layout.Length;
+        // Objects from the old version of the level.
+        DestroyIfFound("Hazards");
+        DestroyIfFound("Lantern");
+        DestroyIfFound("Stars");
 
-        if (Layout.Any(row => row.Length != width))
-        {
-            Debug.LogError("Level1Builder: every layout row must be the same length.");
-            return;
-        }
+        // Everything under the map root turns when the maze flips.
+        Transform map = FindOrCreate("Map").transform;
+        map.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+        map.localScale = Vector3.one;
+        floor.transform.SetParent(map, true);
+        walls.transform.SetParent(map, true);
+        exit.transform.SetParent(map, true);
 
-        Undo.SetCurrentGroupName("Build Level 1 Maze");
-        int undoGroup = Undo.GetCurrentGroup();
-
-        // Walls
+        // Walls. Their colliders merge into one shape so the player can't
+        // snag on the seams between neighbouring blocks.
         for (int i = walls.transform.childCount - 1; i >= 0; i--)
         {
-            Undo.DestroyObjectImmediate(walls.transform.GetChild(i).gameObject);
+            Object.DestroyImmediate(walls.transform.GetChild(i).gameObject);
         }
+
+        CompositeCollider2D composite = SetUpWallComposite(walls);
 
         List<RectInt> wallRects = MergeWallTiles(width, height);
         foreach (RectInt rect in wallRects)
@@ -100,85 +163,248 @@ public static class Level1Builder
                 wallColor, 0
             );
             wall.transform.localScale = new Vector3(rect.width, rect.height, 1f);
-            wall.AddComponent<BoxCollider2D>();
+            wall.AddComponent<BoxCollider2D>().compositeOperation =
+                Collider2D.CompositeOperation.Merge;
         }
 
-        // Spike traps
-        GameObject hazards = RecreateRoot("Hazards");
-        int spikeCount = 0;
+        composite.GenerateGeometry();
 
-        foreach (Vector2Int tile in TilesWith('X'))
+        // Stars
+        Transform stars = new GameObject("Stars").transform;
+        stars.SetParent(map, false);
+        int starCount = 0;
+
+        foreach (List<Vector2Int> group in TileGroups('*'))
         {
-            GameObject spike = CreateSprite(
-                "Spike Trap", hazards.transform, TileCenter(tile, width, height),
-                squareSprite, litMaterial, SpikeColor, 1
+            Vector2 position = Vector2.zero;
+            foreach (Vector2Int tile in group)
+            {
+                position += TileCenter(tile, width, height);
+            }
+            position /= group.Count;
+
+            GameObject star = CreateSprite(
+                "Star", stars, position, starSprite, litMaterial, Color.white, 6
             );
-            spike.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
+            star.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
 
-            BoxCollider2D trigger = spike.AddComponent<BoxCollider2D>();
+            CircleCollider2D trigger = star.AddComponent<CircleCollider2D>();
             trigger.isTrigger = true;
-            trigger.size = new Vector2(0.85f, 0.85f);
+            trigger.radius = 0.6f;
 
-            spike.AddComponent<Hazard>();
-            spikeCount++;
-        }
-
-        // Lantern
-        GameObject oldLantern = GameObject.Find("Lantern");
-        if (oldLantern != null)
-        {
-            Undo.DestroyObjectImmediate(oldLantern);
-        }
-
-        if (TryGetMarker('L', width, height, out Vector2 lanternPosition))
-        {
-            GameObject lantern = CreateSprite(
-                "Lantern", null, lanternPosition, squareSprite, litMaterial,
-                LanternColor, 6
-            );
-            lantern.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
-            lantern.transform.rotation = Quaternion.Euler(0f, 0f, 45f);
-
-            CircleCollider2D trigger = lantern.AddComponent<CircleCollider2D>();
-            trigger.isTrigger = true;
-            trigger.radius = 0.8f;
-
-            lantern.AddComponent<LanternPickup>();
+            star.AddComponent<StarCollectible>();
+            star.AddComponent<PulsingGlow>().Configure(StarGlowColor, 1.2f, 0.4f, 0.9f);
+            starCount++;
         }
 
         // Player, exit and floor
         if (TryGetMarker('S', width, height, out Vector2 startPosition))
         {
-            Undo.RecordObject(player.transform, "Move Player");
             player.transform.position = startPosition;
         }
 
         if (TryGetMarker('E', width, height, out Vector2 exitPosition))
         {
-            Undo.RecordObject(exit.transform, "Move Exit");
             exit.transform.position = exitPosition;
         }
 
-        Undo.RecordObject(floor.transform, "Resize Floor");
+        // A door standing on the floor.
+        exit.transform.localScale = new Vector3(ExitSize.x, ExitSize.y, 1f);
+
+        // No glow on the exit: the player has to find it in the dark.
+        PulsingGlow exitGlow = exit.GetComponent<PulsingGlow>();
+        if (exitGlow != null)
+        {
+            Object.DestroyImmediate(exitGlow);
+        }
+
         floor.transform.position = Vector3.zero;
         floor.transform.localScale = new Vector3(width, height, 1f);
 
-        if (player.GetComponent<WallBumpFeedback>() == null)
+        ConfigurePlayer(player);
+
+        Light2D visionLight = BuildVisionLight(player.transform);
+        MapFlipController mapFlip = ConfigureMapFlip(gameManager, map, player, visionLight);
+        CameraFollow cameraFollow = ConfigureCamera(camera, player, floorRenderer, mapFlip);
+        ConfigureGameManager(gameManager, mapFlip, cameraFollow);
+
+        // Also frames the camera around the maze.
+        if (!HudBuilder.BuildHud())
         {
-            Undo.AddComponent<WallBumpFeedback>(player);
+            return false;
         }
 
-        HudBuilder.FrameCamera(camera);
-        SetPreviewSeconds(gameManager);
-        EnsureSceneInBuildSettings();
-
-        Undo.CollapseUndoOperations(undoGroup);
-        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
 
         Debug.Log(
-            $"Level1Builder: built a {width}x{height} maze with " +
-            $"{wallRects.Count} walls and {spikeCount} spike traps. Save the scene to keep it."
+            $"Level1Builder: built a {width}x{height} map with {wallRects.Count} " +
+            $"walls and {starCount} stars, and saved {ScenePath}."
         );
+        return true;
+    }
+
+    private static CompositeCollider2D SetUpWallComposite(GameObject walls)
+    {
+        // The composite needs a body; a static one never moves on its own,
+        // only when the map flip turns it.
+        Rigidbody2D body = walls.GetComponent<Rigidbody2D>();
+        if (body == null)
+        {
+            body = walls.AddComponent<Rigidbody2D>();
+        }
+        body.bodyType = RigidbodyType2D.Static;
+
+        CompositeCollider2D composite = walls.GetComponent<CompositeCollider2D>();
+        if (composite == null)
+        {
+            composite = walls.AddComponent<CompositeCollider2D>();
+        }
+        composite.geometryType = CompositeCollider2D.GeometryType.Polygons;
+        return composite;
+    }
+
+    private static void ConfigurePlayer(GameObject player)
+    {
+        // Removes the old wall bump script, which no longer exists.
+        GameObjectUtility.RemoveMonoBehavioursWithMissingScript(player);
+
+        // A box stands squarely on ledges, where a circle would roll off.
+        CircleCollider2D circle = player.GetComponent<CircleCollider2D>();
+        if (circle != null)
+        {
+            Object.DestroyImmediate(circle);
+        }
+
+        BoxCollider2D box = player.GetComponent<BoxCollider2D>();
+        if (box == null)
+        {
+            box = player.AddComponent<BoxCollider2D>();
+        }
+        float scale = player.transform.lossyScale.x;
+        box.size = Vector2.one * (PlayerBoxSize / scale);
+        box.offset = Vector2.zero;
+
+        Rigidbody2D body = player.GetComponent<Rigidbody2D>();
+        body.bodyType = RigidbodyType2D.Dynamic;
+        body.gravityScale = PlayerGravityScale;
+        body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        // No friction, so the player slides down walls instead of sticking.
+        body.sharedMaterial = LoadOrCreatePlayerMaterial();
+
+        PlayerMovement movement = player.GetComponent<PlayerMovement>();
+        if (movement == null)
+        {
+            movement = player.AddComponent<PlayerMovement>();
+        }
+
+        SerializedObject serialized = new SerializedObject(movement);
+        serialized.FindProperty("moveSpeed").floatValue = PlayerMoveSpeed;
+        serialized.FindProperty("jumpSpeed").floatValue = PlayerJumpSpeed;
+        serialized.ApplyModifiedProperties();
+    }
+
+    private static PhysicsMaterial2D LoadOrCreatePlayerMaterial()
+    {
+        PhysicsMaterial2D material =
+            AssetDatabase.LoadAssetAtPath<PhysicsMaterial2D>(PlayerMaterialPath);
+
+        if (material != null)
+        {
+            return material;
+        }
+
+        if (!AssetDatabase.IsValidFolder("Assets/Physics"))
+        {
+            AssetDatabase.CreateFolder("Assets", "Physics");
+        }
+
+        material = new PhysicsMaterial2D("PlayerNoFriction") { friction = 0f, bounciness = 0f };
+        AssetDatabase.CreateAsset(material, PlayerMaterialPath);
+        return material;
+    }
+
+    // The circle of light the player carries. It's a child of the player
+    // so it follows them through the flip.
+    private static Light2D BuildVisionLight(Transform player)
+    {
+        const string name = "Vision Light";
+        Transform old = player.Find(name);
+        if (old != null)
+        {
+            Object.DestroyImmediate(old.gameObject);
+        }
+
+        GameObject lightObject = new GameObject(name);
+        lightObject.transform.SetParent(player, false);
+
+        // Cancel the player's scale so the radii are in world units.
+        Vector3 scale = player.lossyScale;
+        lightObject.transform.localScale = new Vector3(1f / scale.x, 1f / scale.y, 1f);
+
+        Light2D light = lightObject.AddComponent<Light2D>();
+        light.lightType = Light2D.LightType.Point;
+        light.color = VisionColor;
+        light.intensity = 1f;
+        light.pointLightInnerRadius = VisionInnerRadius;
+        light.pointLightOuterRadius = VisionOuterRadius;
+        return light;
+    }
+
+    private static MapFlipController ConfigureMapFlip(
+        GameManager gameManager, Transform map, GameObject player, Light2D visionLight)
+    {
+        MapFlipController mapFlip = gameManager.GetComponent<MapFlipController>();
+        if (mapFlip == null)
+        {
+            mapFlip = gameManager.gameObject.AddComponent<MapFlipController>();
+        }
+
+        SerializedObject serialized = new SerializedObject(mapFlip);
+        serialized.FindProperty("mapRoot").objectReferenceValue = map;
+        serialized.FindProperty("player").objectReferenceValue = player.GetComponent<Rigidbody2D>();
+        serialized.FindProperty("visionLight").objectReferenceValue = visionLight;
+        serialized.FindProperty("secondsBetweenFlips").floatValue = SecondsBetweenFlips;
+        serialized.FindProperty("warningSeconds").floatValue = FlipWarningSeconds;
+        serialized.ApplyModifiedProperties();
+        return mapFlip;
+    }
+
+    private static CameraFollow ConfigureCamera(
+        Camera camera, GameObject player, SpriteRenderer floor, MapFlipController mapFlip)
+    {
+        CameraFollow follow = camera.GetComponent<CameraFollow>();
+        if (follow == null)
+        {
+            follow = camera.gameObject.AddComponent<CameraFollow>();
+        }
+
+        SerializedObject serialized = new SerializedObject(follow);
+        serialized.FindProperty("target").objectReferenceValue = player.transform;
+        serialized.FindProperty("mapBounds").objectReferenceValue = floor;
+        serialized.FindProperty("mapFlip").objectReferenceValue = mapFlip;
+        serialized.FindProperty("followSize").floatValue = FollowCameraSize;
+        serialized.FindProperty("topBarShare").floatValue =
+            HudBuilder.TopBarHeight / HudBuilder.ReferenceHeight;
+        serialized.FindProperty("bottomBarShare").floatValue =
+            HudBuilder.BottomBarHeight / HudBuilder.ReferenceHeight;
+        serialized.ApplyModifiedProperties();
+        return follow;
+    }
+
+    private static void ConfigureGameManager(
+        GameManager gameManager, MapFlipController mapFlip, CameraFollow cameraFollow)
+    {
+        SerializedObject serialized = new SerializedObject(gameManager);
+        serialized.FindProperty("previewSeconds").floatValue = PreviewSeconds;
+        serialized.FindProperty("revealSeconds").floatValue = RevealSeconds;
+        serialized.FindProperty("revealCharges").intValue = RevealCharges;
+        serialized.FindProperty("darkIntensity").floatValue = 0f;
+        serialized.FindProperty("mapFlip").objectReferenceValue = mapFlip;
+        serialized.FindProperty("cameraFollow").objectReferenceValue = cameraFollow;
+        serialized.ApplyModifiedProperties();
     }
 
     // Greedily merges wall tiles into rectangles so the maze uses a few
@@ -241,6 +467,42 @@ public static class Level1Builder
         }
     }
 
+    // Splits the tiles with this letter into groups that touch each other.
+    private static List<List<Vector2Int>> TileGroups(char marker)
+    {
+        HashSet<Vector2Int> remaining = new HashSet<Vector2Int>(TilesWith(marker));
+        List<List<Vector2Int>> groups = new List<List<Vector2Int>>();
+        Vector2Int[] steps = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+
+        while (remaining.Count > 0)
+        {
+            Vector2Int first = remaining.First();
+            remaining.Remove(first);
+
+            List<Vector2Int> group = new List<Vector2Int>();
+            Queue<Vector2Int> queue = new Queue<Vector2Int>();
+            queue.Enqueue(first);
+
+            while (queue.Count > 0)
+            {
+                Vector2Int tile = queue.Dequeue();
+                group.Add(tile);
+
+                foreach (Vector2Int step in steps)
+                {
+                    if (remaining.Remove(tile + step))
+                    {
+                        queue.Enqueue(tile + step);
+                    }
+                }
+            }
+
+            groups.Add(group);
+        }
+
+        return groups;
+    }
+
     private static bool TryGetMarker(char marker, int width, int height, out Vector2 position)
     {
         List<Vector2Int> tiles = TilesWith(marker).ToList();
@@ -281,7 +543,6 @@ public static class Level1Builder
         Material material, Color color, int sortingOrder)
     {
         GameObject go = new GameObject(name);
-        Undo.RegisterCreatedObjectUndo(go, $"Create {name}");
         go.transform.SetParent(parent, false);
         go.transform.position = position;
 
@@ -293,40 +554,18 @@ public static class Level1Builder
         return go;
     }
 
-    private static GameObject RecreateRoot(string name)
+    private static GameObject FindOrCreate(string name)
+    {
+        GameObject existing = GameObject.Find(name);
+        return existing != null ? existing : new GameObject(name);
+    }
+
+    private static void DestroyIfFound(string name)
     {
         GameObject existing = GameObject.Find(name);
         if (existing != null)
         {
-            Undo.DestroyObjectImmediate(existing);
+            Object.DestroyImmediate(existing);
         }
-
-        GameObject root = new GameObject(name);
-        Undo.RegisterCreatedObjectUndo(root, $"Create {name}");
-        return root;
-    }
-
-    private static void SetPreviewSeconds(GameManager gameManager)
-    {
-        SerializedObject serialized = new SerializedObject(gameManager);
-        serialized.FindProperty("previewSeconds").floatValue = PreviewSeconds;
-        serialized.ApplyModifiedProperties();
-    }
-
-    // Restart (R) reloads the scene by build index, so the scene must be in
-    // the build list for it to work.
-    private static void EnsureSceneInBuildSettings()
-    {
-        string scenePath = SceneManager.GetActiveScene().path;
-        List<EditorBuildSettingsScene> scenes = EditorBuildSettings.scenes.ToList();
-
-        if (scenes.Any(s => s.path == scenePath))
-        {
-            return;
-        }
-
-        scenes.Insert(0, new EditorBuildSettingsScene(scenePath, true));
-        EditorBuildSettings.scenes = scenes.ToArray();
-        Debug.Log($"Level1Builder: added {scenePath} to the build settings.");
     }
 }

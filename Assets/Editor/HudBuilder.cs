@@ -6,10 +6,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // Builds the in-game HUD for whichever level is open: a status banner at
-// the top, and a bottom bar with the controls and a legend of the shapes
-// in the maze. Every level gets the same controls; the legend lists only
-// the objects that level has.
-// Run it from the menu: Tools > Build HUD.
+// the top, and a bottom bar with the controls, the star count and a legend
+// of the shapes in the maze. Every level gets the same controls; the
+// legend lists only the objects that level has.
+// Level builders call it; run it by hand from the menu: Tools > Build HUD.
 public static class HudBuilder
 {
     // The canvas scales with screen height, so these are pixels at 1080p.
@@ -39,13 +39,21 @@ public static class HudBuilder
     [MenuItem("Tools/Build HUD")]
     private static void Build()
     {
+        if (BuildHud())
+        {
+            Debug.Log("HudBuilder: HUD built. Save the scene to keep it.");
+        }
+    }
+
+    internal static bool BuildHud()
+    {
         GameManager gameManager = Object.FindAnyObjectByType<GameManager>();
         Camera camera = Camera.main;
 
         if (gameManager == null || camera == null)
         {
             Debug.LogError("HudBuilder: open a level scene first.");
-            return;
+            return false;
         }
 
         SerializedObject managerData = new SerializedObject(gameManager);
@@ -55,7 +63,7 @@ public static class HudBuilder
         if (statusText == null || statusText.canvas == null)
         {
             Debug.LogError("HudBuilder: GameManager needs its Status Text assigned.");
-            return;
+            return false;
         }
 
         font = statusText.font;
@@ -71,10 +79,12 @@ public static class HudBuilder
         RemoveOldBars(canvas.transform, statusText);
 
         RectTransform topBar = BuildTopBar(canvas.transform, statusText);
-        RectTransform bottomBar = BuildBottomBar(canvas.transform, out TMP_Text chargesText);
+        RectTransform bottomBar = BuildBottomBar(
+            canvas.transform, out TMP_Text chargesText, out TMP_Text starsText);
         Undo.RegisterCreatedObjectUndo(bottomBar.gameObject, "Create HUD Bottom Bar");
 
         managerData.FindProperty("chargesText").objectReferenceValue = chargesText;
+        managerData.FindProperty("starsText").objectReferenceValue = starsText;
         managerData.ApplyModifiedProperties();
 
         FrameCamera(camera);
@@ -82,8 +92,7 @@ public static class HudBuilder
         Undo.CollapseUndoOperations(undoGroup);
         EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
         Selection.activeGameObject = topBar.gameObject;
-
-        Debug.Log("HudBuilder: HUD built. Save the scene to keep it.");
+        return true;
     }
 
     private static void ConfigureCanvasScaler(Canvas canvas)
@@ -147,27 +156,36 @@ public static class HudBuilder
         return bar;
     }
 
-    private static RectTransform BuildBottomBar(Transform canvas, out TMP_Text chargesText)
+    private static RectTransform BuildBottomBar(
+        Transform canvas, out TMP_Text chargesText, out TMP_Text starsText)
     {
         RectTransform bar = CreateBar(BottomBarName, canvas, top: false);
 
-        HorizontalLayoutGroup layout = AddRow(bar, 0f);
+        HorizontalLayoutGroup layout = AddRow(bar, 56f);
         layout.padding = new RectOffset(56, 56, 14, 14);
 
         // Controls
         RectTransform controls = CreateSection(bar, "CONTROLS");
         RectTransform controlRow = CreateUi("Items", controls);
-        AddRow(controlRow, 48f);
+        AddRow(controlRow, 40f);
 
         RectTransform move = CreateUi("Move", controlRow);
         AddRow(move, 14f);
-        BuildWasdCluster(move);
-        BuildLabelColumn(move, "Move", "or ← ↑ ↓ →");
+        RectTransform moveKeys = CreateUi("AD", move);
+        AddRow(moveKeys, 4f);
+        CreateKeyCap(moveKeys, "A", 40f, 40f);
+        CreateKeyCap(moveKeys, "D", 40f, 40f);
+        BuildLabelColumn(move, "Move", "or ← →");
 
-        RectTransform reveal = CreateUi("Reveal", controlRow);
+        RectTransform jump = CreateUi("Jump", controlRow);
+        AddRow(jump, 14f);
+        CreateKeyCap(jump, "SPACE", 112f, 40f);
+        BuildLabelColumn(jump, "Jump", "or W / ↑");
+
+        RectTransform reveal = CreateUi("Light", controlRow);
         AddRow(reveal, 14f);
-        CreateKeyCap(reveal, "SPACE", 112f, 40f);
-        chargesText = BuildLabelColumn(reveal, "Reveal", "●●●");
+        CreateKeyCap(reveal, "F", 40f, 40f);
+        chargesText = BuildLabelColumn(reveal, "Light", "●●●");
         chargesText.fontSize = 22f;
         chargesText.characterSpacing = 12f;
         chargesText.color = Color.white;
@@ -182,9 +200,27 @@ public static class HudBuilder
         CreateKeyCap(menu, "ESC", 56f, 40f);
         BuildLabelColumn(menu, "Menu", null);
 
-        // Pushes the legend to the right edge.
+        // Pushes the stars and legend to the right edge.
         RectTransform spacer = CreateUi("Spacer", bar);
         spacer.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
+
+        SpriteRenderer player = FindRenderer("Player");
+        SpriteRenderer exit = FindRenderer<ExitTrigger>();
+        SpriteRenderer star = FindRenderer<StarCollectible>();
+        SpriteRenderer portal = FindRenderer("Portals");
+        SpriteRenderer spike = FindRenderer<Hazard>();
+
+        // Stars
+        starsText = null;
+        if (star != null)
+        {
+            RectTransform stars = CreateSection(bar, "STARS");
+            RectTransform starRow = CreateUi("Items", stars);
+            AddRow(starRow, 14f);
+            CreateIcon(starRow, star.sprite, star.color, 30f, 0f);
+            starsText = AddText(CreateUi("Count", starRow), "0 / 0", 28f, LabelColor);
+            starsText.fontStyle = FontStyles.Bold;
+        }
 
         // Legend
         RectTransform legend = CreateSection(bar, "LEGEND");
@@ -195,14 +231,6 @@ public static class HudBuilder
         gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         gridLayout.childAlignment = TextAnchor.MiddleLeft;
 
-        SpriteRenderer player = FindRenderer("Player");
-        SpriteRenderer exit = FindRenderer("Exit");
-        SpriteRenderer lantern = FindRenderer("Lantern");
-        SpriteRenderer portal = FindRenderer("Portals");
-        SpriteRenderer torch = FindRenderer("Torch");
-        Hazard spike = Object.FindAnyObjectByType<Hazard>();
-        SpriteRenderer spikeRenderer = spike != null ? spike.GetComponent<SpriteRenderer>() : null;
-
         Sprite square = exit != null ? exit.sprite : null;
 
         CreateLegendItem(grid, "You",
@@ -212,27 +240,21 @@ public static class HudBuilder
             square, exit != null ? exit.color : Color.green, 24f, 0f);
         int items = 2;
 
-        if (lantern != null)
+        if (star != null)
         {
-            CreateLegendItem(grid, "Collectible", square, lantern.color, 18f, 45f);
+            CreateLegendItem(grid, "Star", star.sprite, star.color, 28f, 0f);
             items++;
         }
 
-        if (spikeRenderer != null)
+        if (spike != null)
         {
-            CreateLegendItem(grid, "Spike trap", square, spikeRenderer.color, 20f, 0f);
+            CreateLegendItem(grid, "Spike trap", square, spike.color, 20f, 0f);
             items++;
         }
 
         if (portal != null)
         {
             CreateLegendItem(grid, "Portal", portal.sprite, portal.color, 28f, 0f);
-            items++;
-        }
-
-        if (torch != null)
-        {
-            CreateLegendItem(grid, "Torch", torch.sprite, torch.color, 30f, 0f);
             items++;
         }
 
@@ -280,27 +302,6 @@ public static class HudBuilder
         header.fontStyle = FontStyles.Bold;
         header.characterSpacing = 8f;
         return section;
-    }
-
-    // W on top, A S D underneath, like a real keyboard.
-    private static void BuildWasdCluster(Transform parent)
-    {
-        RectTransform cluster = CreateUi("WASD", parent);
-        VerticalLayoutGroup column = cluster.gameObject.AddComponent<VerticalLayoutGroup>();
-        column.spacing = 4f;
-        column.childAlignment = TextAnchor.MiddleCenter;
-        column.childControlWidth = true;
-        column.childControlHeight = true;
-        column.childForceExpandWidth = false;
-        column.childForceExpandHeight = false;
-
-        CreateKeyCap(cluster, "W", 30f, 30f);
-
-        RectTransform bottomRow = CreateUi("ASD", cluster);
-        AddRow(bottomRow, 4f);
-        CreateKeyCap(bottomRow, "A", 30f, 30f);
-        CreateKeyCap(bottomRow, "S", 30f, 30f);
-        CreateKeyCap(bottomRow, "D", 30f, 30f);
     }
 
     private static TextMeshProUGUI BuildLabelColumn(Transform parent, string label, string hint)
@@ -356,9 +357,15 @@ public static class HudBuilder
     {
         RectTransform item = CreateUi(label, parent);
         AddRow(item, 14f);
+        CreateIcon(item, sprite, color, iconSize, rotation);
+        AddText(CreateUi("Text", item), label, 22f, LabelColor);
+    }
 
+    private static void CreateIcon(
+        Transform parent, Sprite sprite, Color color, float iconSize, float rotation)
+    {
         // A fixed-size slot keeps the labels lined up whatever the icon shape.
-        RectTransform slot = CreateUi("Icon", item);
+        RectTransform slot = CreateUi("Icon", parent);
         LayoutElement slotSize = slot.gameObject.AddComponent<LayoutElement>();
         slotSize.preferredWidth = 30f;
         slotSize.preferredHeight = 30f;
@@ -368,8 +375,6 @@ public static class HudBuilder
         icon.localRotation = Quaternion.Euler(0f, 0f, rotation);
         Image image = AddImage(icon, sprite, color);
         image.preserveAspect = true;
-
-        AddText(CreateUi("Text", item), label, 22f, LabelColor);
     }
 
     // Looks in children too: the portal sprites sit under a Portals parent.
@@ -377,6 +382,13 @@ public static class HudBuilder
     {
         GameObject go = GameObject.Find(objectName);
         return go != null ? go.GetComponentInChildren<SpriteRenderer>(true) : null;
+    }
+
+    // By component rather than name, since legend items share those names.
+    private static SpriteRenderer FindRenderer<T>() where T : Component
+    {
+        T found = Object.FindAnyObjectByType<T>();
+        return found != null ? found.GetComponent<SpriteRenderer>() : null;
     }
 
     // Fits the maze into the screen area between the HUD bars. The HUD
