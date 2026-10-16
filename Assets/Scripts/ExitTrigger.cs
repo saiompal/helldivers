@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// The level's goal. It's hidden during the preview so the player has to
-// find it, and stays locked, dimmed red, until every star is collected.
+// Level 2 shows the goal during the map preview. It remains locked, dimmed
+// red, until every star is collected. Other levels keep their preview rule.
 public class ExitTrigger : MonoBehaviour
 {
     [SerializeField] private Color lockedColor = new Color(0.45f, 0.12f, 0.1f);
@@ -43,9 +43,10 @@ public class ExitTrigger : MonoBehaviour
 
     private void Update()
     {
-        if (spriteRenderer != null && GameManager.Instance != null)
+        GameManager manager = GameManager.Instance;
+        if (spriteRenderer != null && manager != null)
         {
-            spriteRenderer.enabled = !GameManager.Instance.IsPreviewing;
+            spriteRenderer.enabled = manager.IsLevel2 || !manager.IsPreviewing;
         }
     }
 

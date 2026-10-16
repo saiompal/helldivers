@@ -22,10 +22,11 @@ public static class MainMenuBuilder
 
     private const string MenuScenePath = "Assets/Scenes/MainMenu.unity";
 
-    // Levels in play order. Play starts the first one.
+    // The menu shows one matching button for each level.
     private static readonly string[] LevelPaths =
     {
         Level1Builder.ScenePath,
+        "Assets/Scenes/Level2.unity",
     };
 
     private static readonly string[] HowToPlay =
@@ -35,7 +36,7 @@ public static class MainMenuBuilder
         "<b>F</b> lights the whole level for a moment, but charges are limited",
         "The world <b>flips</b> every few seconds. Your light pulses red before it does",
         "Gravity stays down, so a wall you can't climb may be one you can walk under",
-        "The <color=#5CE68A>exit</color> is hidden, and stays locked until you collect every <color=#FFD54A>star</color>",
+        "The <color=#5CE68A>exit</color> stays locked until you collect every <color=#FFD54A>star</color>",
     };
 
     private static readonly Color BackgroundColor = new Color(0.03f, 0.03f, 0.04f);
@@ -47,6 +48,19 @@ public static class MainMenuBuilder
     private static readonly Color ButtonTextColor = new Color(0.1f, 0.1f, 0.13f);
 
     private static Sprite roundedSprite;
+
+    // Register both existing level scenes when this replacement is imported.
+    // Preserve the project's other scene entries and input configuration.
+    [InitializeOnLoadMethod]
+    private static void RegisterLevelScenes()
+    {
+        EditorApplication.delayCall += () =>
+        {
+            if (!EditorApplication.isPlayingOrWillChangePlaymode &&
+                File.Exists(MenuScenePath) && LevelPaths.All(File.Exists))
+                SetBuildOrder();
+        };
+    }
 
     [MenuItem("Tools/Build Alpha (Menu + Level 1)")]
     private static void BuildAlpha()
@@ -120,10 +134,24 @@ public static class MainMenuBuilder
 
         BuildHowToPlay(canvasObject.transform);
 
-        Button play = CreateButton(canvasObject.transform, "Play");
-        UnityEventTools.AddStringPersistentListener(
-            play.onClick, menu.LoadLevel,
-            Path.GetFileNameWithoutExtension(LevelPaths[0]));
+        GameObject levels = new GameObject("Levels", typeof(RectTransform));
+        levels.transform.SetParent(canvasObject.transform, false);
+        HorizontalLayoutGroup levelRow = levels.AddComponent<HorizontalLayoutGroup>();
+        levelRow.spacing = 24f;
+        levelRow.childAlignment = TextAnchor.MiddleCenter;
+        levelRow.childControlWidth = true;
+        levelRow.childControlHeight = true;
+        levelRow.childForceExpandWidth = false;
+        levelRow.childForceExpandHeight = false;
+        Button play = null;
+        for (int i = 0; i < LevelPaths.Length; i++)
+        {
+            Button level = CreateButton(levels.transform, $"Level {i + 1}");
+            UnityEventTools.AddStringPersistentListener(
+                level.onClick, menu.LoadLevel,
+                Path.GetFileNameWithoutExtension(LevelPaths[i]));
+            if (play == null) play = level;
+        }
 
         Button quit = CreateButton(canvasObject.transform, "Quit");
         UnityEventTools.AddPersistentListener(quit.onClick, menu.Quit);
@@ -257,7 +285,14 @@ public static class MainMenuBuilder
             File.Exists(s.path) &&
             !s.path.EndsWith("/SampleScene.unity")));
 
-        EditorBuildSettings.scenes = scenes.ToArray();
-        AssetDatabase.SaveAssets();
+        EditorBuildSettingsScene[] current = EditorBuildSettings.scenes;
+        bool changed = current.Length != scenes.Count ||
+            scenes.Where((s, i) => i >= current.Length ||
+                s.path != current[i].path || s.enabled != current[i].enabled).Any();
+        if (changed)
+        {
+            EditorBuildSettings.scenes = scenes.ToArray();
+            AssetDatabase.SaveAssets();
+        }
     }
 }
