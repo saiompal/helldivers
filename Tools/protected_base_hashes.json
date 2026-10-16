@@ -1,0 +1,12 @@
+{
+  "Assets/Scenes/Level1.unity": "c1e0883fee5ef1e47e5e3a7a22948b1dc13fbc569e87a64f8348b6ccda4c4b0c",
+  "Assets/Scenes/MainMenu.unity": "11f54b0c05ee0528a9e4716d7cdb07443a79df49209b0fe63abee76c8e793b9c",
+  "Assets/Scripts/GameManager.cs": "72799aa934da3b01aaefc0d8b92dbb73a4074bd9d8fcf8f24a9434d3397d34e5",
+  "Assets/Scripts/MapFlipController.cs": "c5fc7e5d75337ef6de3dbe78ec133913bfea1e036f5f28c5944dd74bf40bf2ae",
+  "Assets/Scripts/CameraFollow.cs": "3beda1fd2f0343c71e3c5a46be79ad9b60bd9ab5cc7ade7a789c3cb797fb0c59",
+  "Assets/Scripts/StarCollectible.cs": "fcd427dc997a512e870092404aee27ca65cc2feb63dc06130c43b422dfadc545",
+  "Assets/Scripts/ExitTrigger.cs": "64e2dc733e607907909e1fdeefa95f7ab9b795610bc04a5c1449f6bd1598e16c",
+  "Assets/Editor/Level1Builder.cs": "58d20217080ee1ccef847447c2d531a5f0c7e1cd5eff6841e9caf954414fc264",
+  "Assets/Scripts/PlayerMovement.cs": "8e825ae5093b2d08bdd2bdb3f9771a6b2087e694825b3b886552f81b8bee968a",
+  "Assets/Editor/HudBuilder.cs": "bbf463c98f2c9ff4453717529deab82b830d0760490e301a6afe71659e62a73a"
+}

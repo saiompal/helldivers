@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
 
     public bool IsExitUnlocked => starsCollected >= starsTotal;
     public bool IsPreviewing => phase == Phase.Preview;
+    public bool IsLevel2 => gameObject.scene.name == "Level2";
 
     // Fires once, when the last star is collected.
     public event Action ExitUnlocked;
@@ -200,15 +201,25 @@ public class GameManager : MonoBehaviour
         starsCollected++;
         UpdateStarsText();
 
+        // Every Level 2 star earns one stored F reveal, including the fifth.
+        // Earned charges may exceed the three starting charges.
+        if (IsLevel2)
+        {
+            chargesRemaining++;
+            UpdateChargesText();
+        }
+
+        string reward = IsLevel2 ? "  \u00B7  +1 light charge" : string.Empty;
+
         if (IsExitUnlocked)
         {
-            ShowToast($"<color={SuccessColor}>All stars found. The exit is open</color>");
+            ShowToast($"<color={SuccessColor}>All stars found. The exit is open{reward}</color>");
             ExitUnlocked?.Invoke();
         }
         else
         {
             ShowToast(
-                $"<color={LanternColor}>Star collected  {starsCollected} / {starsTotal}</color>"
+                $"<color={LanternColor}>Star collected  {starsCollected} / {starsTotal}{reward}</color>"
             );
         }
 
@@ -277,6 +288,14 @@ public class GameManager : MonoBehaviour
     {
         if (chargesText == null)
         {
+            return;
+        }
+
+        // A compact count keeps earned charges readable without overflowing
+        // the original three-dot space or creating a negative string length.
+        if (IsLevel2)
+        {
+            chargesText.text = $"<color={LanternColor}>\u25CF \u00D7 {chargesRemaining}</color>";
             return;
         }
 
