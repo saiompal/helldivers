@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 // Creates the MainMenu scene and puts it first in the build settings.
 // Run it from the menu: Tools > Main Menu > Build Main Menu Scene,
-// or Tools > Build Alpha to rebuild the menu and Level 1 together.
+// or Tools > Build Alpha to rebuild the menu and Level 0 together.
 public static class MainMenuBuilder
 {
     private const string GameTitle = "IN THE DARK";
@@ -25,8 +25,10 @@ public static class MainMenuBuilder
     // The menu shows one matching button for each level.
     private static readonly string[] LevelPaths =
     {
-        Level1Builder.ScenePath,
+        Level0Builder.ScenePath,
+        "Assets/Scenes/Level1.unity",
         "Assets/Scenes/Level2.unity",
+        "Assets/Scenes/Level3.unity",
     };
 
     private static readonly string[] HowToPlay =
@@ -49,7 +51,7 @@ public static class MainMenuBuilder
 
     private static Sprite roundedSprite;
 
-    // Register both existing level scenes when this replacement is imported.
+    // Register all existing level scenes when this replacement is imported.
     // Preserve the project's other scene entries and input configuration.
     [InitializeOnLoadMethod]
     private static void RegisterLevelScenes()
@@ -62,7 +64,7 @@ public static class MainMenuBuilder
         };
     }
 
-    [MenuItem("Tools/Build Alpha (Menu + Level 1)")]
+    [MenuItem("Tools/Build Alpha (Menu + Level 0)")]
     private static void BuildAlpha()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -70,7 +72,7 @@ public static class MainMenuBuilder
             return;
         }
 
-        if (Level1Builder.Build())
+        if (Level0Builder.Build())
         {
             BuildMenu();
             EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
@@ -146,7 +148,7 @@ public static class MainMenuBuilder
         Button play = null;
         for (int i = 0; i < LevelPaths.Length; i++)
         {
-            Button level = CreateButton(levels.transform, $"Level {i + 1}");
+            Button level = CreateButton(levels.transform, $"Level {i}");
             UnityEventTools.AddStringPersistentListener(
                 level.onClick, menu.LoadLevel,
                 Path.GetFileNameWithoutExtension(LevelPaths[i]));
@@ -172,6 +174,12 @@ public static class MainMenuBuilder
         SetBuildOrder();
 
         Debug.Log($"MainMenuBuilder: created {MenuScenePath} and set the build order.");
+    }
+
+    // Entry point for headless validation/regeneration after scene remapping.
+    public static void BuildFromCommandLine()
+    {
+        BuildMenu();
     }
 
     private static void BuildHowToPlay(Transform parent)

@@ -1,156 +1,233 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Side-on platformer movement: run left and right, jump, and fall. Gravity
-// comes from the Rigidbody2D's gravity scale and always pulls down the
-// screen, so when the map flips the player falls towards what used to be
-// the ceiling.
+// Standard side-on controller used by every level. Horizontal movement uses
+// acceleration instead of assigning velocity directly, so slopes, moving
+// platforms, conveyors, and momentum all behave consistently.
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Running")]
-    [SerializeField, Min(0f)] private float moveSpeed = 6f;
+    [Tooltip("Maximum horizontal world speed.")]
+    [SerializeField, Min(0f)] private float moveSpeed = 7.5f;
+    [SerializeField, Min(0f)] private float groundAcceleration = 38f;
+    [SerializeField, Min(0f)] private float airAcceleration = 12f;
+    [SerializeField, Min(0f)] private float flatGroundBraking = 13f;
 
     [Header("Jumping")]
-    [SerializeField, Min(0f)] private float jumpSpeed = 14f;
-    [SerializeField, Min(0f)] private float maxFallSpeed = 18f;
-    [Tooltip("Letting go of jump while rising multiplies the upward speed by this, for short hops.")]
-    [SerializeField, Range(0f, 1f)] private float jumpCutMultiplier = 0.5f;
+    [SerializeField, Min(0f)] private float jumpSpeed = 13.2f;
+    [SerializeField, Min(0f)] private float maxFallSpeed = 22f;
     [Tooltip("A jump still works this long after running off a ledge.")]
-    [SerializeField, Min(0f)] private float coyoteSeconds = 0.08f;
+    [SerializeField, Min(0f)] private float coyoteSeconds = 0.1f;
     [Tooltip("A jump pressed this long before landing still happens on landing.")]
     [SerializeField, Min(0f)] private float jumpBufferSeconds = 0.12f;
     [Tooltip("How upward a contact must face to count as ground.")]
-    [SerializeField, Range(0f, 1f)] private float minimumGroundNormal = 0.65f;
+    [SerializeField, Range(0f, 1f)] private float minimumGroundNormal = 0.45f;
 
-    private readonly ContactPoint2D[] contacts = new ContactPoint2D[16];
+    private readonly ContactPoint2D[] contacts = new ContactPoint2D[24];
     private Rigidbody2D body;
-    private float horizontal;
+    private float steer;
     private float jumpRequestedUntil = float.NegativeInfinity;
-    private float lastGroundedTime = float.NegativeInfinity;
-    private bool jumpReleased;
+    private float groundedUntil = float.NegativeInfinity;
+    private float normalGravityScale;
+    private Vector2 lastSupportVelocity;
 
     public bool IsGrounded { get; private set; }
 
-    private void Awake()
+    private bool Active =>
+        GameManager.Instance == null || GameManager.Instance.CanPlayerMove;
+
+    protected virtual void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        normalGravityScale = body.gravityScale;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
-        bool canMove = GameManager.Instance == null ||
-                       GameManager.Instance.CanPlayerMove;
         Keyboard keyboard = Keyboard.current;
-
-        if (!canMove || keyboard == null)
+        if (keyboard == null || !Active)
         {
             ClearInput();
             return;
         }
 
-        horizontal = 0f;
+        steer = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f)
+              - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1f : 0f);
 
-        if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
-            horizontal -= 1f;
-
-        if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
-            horizontal += 1f;
-
-        // Only a fresh press asks for a jump; holding it never repeats.
         if (keyboard.spaceKey.wasPressedThisFrame ||
             keyboard.wKey.wasPressedThisFrame ||
             keyboard.upArrowKey.wasPressedThisFrame)
         {
             jumpRequestedUntil = Time.time + jumpBufferSeconds;
         }
-
-        bool jumpHeld = keyboard.spaceKey.isPressed ||
-                        keyboard.wKey.isPressed ||
-                        keyboard.upArrowKey.isPressed;
-
-        if (!jumpHeld && (keyboard.spaceKey.wasReleasedThisFrame ||
-                          keyboard.wKey.wasReleasedThisFrame ||
-                          keyboard.upArrowKey.wasReleasedThisFrame))
-        {
-            jumpReleased = true;
-        }
     }
 
-    private void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
-        // The map flip pauses physics while it turns.
         if (!body.simulated)
         {
+            ClearInput();
             IsGrounded = false;
+            groundedUntil = float.NegativeInfinity;
             return;
         }
 
-        Vector2 velocity = body.linearVelocity;
-        velocity.x = horizontal * moveSpeed;
-
-        // Ignore the ground contact left over from the step we took off on.
-        IsGrounded = velocity.y <= 0.05f && HasGroundContact();
-        if (IsGrounded)
+        if (!Active)
         {
-            lastGroundedTime = Time.time;
+            body.gravityScale = 0f;
+            body.linearVelocity = Vector2.zero;
+            body.angularVelocity = 0f;
+            IsGrounded = false;
+            groundedUntil = float.NegativeInfinity;
+            return;
         }
 
-        bool canJump = Time.time - lastGroundedTime <= coyoteSeconds;
-        if (Time.time <= jumpRequestedUntil && canJump)
+        body.gravityScale = normalGravityScale;
+
+        Vector2 groundNormal = Vector2.up;
+        Vector2 supportVelocity = Vector2.zero;
+        SurfaceEffector2D groundBelt = null;
+        bool grounded = FindGround(
+            ref groundNormal,
+            ref supportVelocity,
+            ref groundBelt
+        );
+        IsGrounded = grounded;
+
+        if (grounded)
         {
-            velocity.y = jumpSpeed;
+            groundedUntil = Time.time + coyoteSeconds;
+            lastSupportVelocity = supportVelocity;
+        }
+
+        Vector2 tangent = new Vector2(groundNormal.y, -groundNormal.x);
+        bool onBelt = grounded && groundBelt != null;
+
+        if (onBelt)
+        {
+            DriveAlongBelt(tangent, supportVelocity, groundBelt);
+        }
+        else
+        {
+            Vector2 direction = grounded ? tangent : Vector2.right;
+            float acceleration = grounded ? groundAcceleration : airAcceleration;
+            body.AddForce(direction * (steer * acceleration * body.mass));
+        }
+
+        // Brake relative to the supporting body. Do not cancel belt motion,
+        // downhill acceleration, or a lift's vertical carrying velocity.
+        if (grounded && !onBelt && Mathf.Abs(groundNormal.x) < 0.08f &&
+            Mathf.Abs(steer) < 0.01f)
+        {
+            Vector2 velocity = body.linearVelocity;
+            velocity.x = Mathf.MoveTowards(
+                velocity.x,
+                supportVelocity.x,
+                flatGroundBraking * Time.fixedDeltaTime
+            );
+            body.linearVelocity = velocity;
+            body.angularVelocity = Mathf.MoveTowards(
+                body.angularVelocity,
+                0f,
+                flatGroundBraking * 50f * Time.fixedDeltaTime
+            );
+        }
+
+        if (Time.time <= jumpRequestedUntil && Time.time <= groundedUntil)
+        {
+            Vector2 velocity = body.linearVelocity;
+            velocity.y = jumpSpeed + lastSupportVelocity.y;
+            body.linearVelocity = velocity;
             jumpRequestedUntil = float.NegativeInfinity;
-            lastGroundedTime = float.NegativeInfinity;
+            groundedUntil = float.NegativeInfinity;
             IsGrounded = false;
         }
 
-        if (jumpReleased)
-        {
-            if (velocity.y > 0f)
-            {
-                velocity.y *= jumpCutMultiplier;
-            }
-            jumpReleased = false;
-        }
-
-        velocity.y = Mathf.Max(velocity.y, -maxFallSpeed);
-        body.linearVelocity = velocity;
+        Vector2 limited = body.linearVelocity;
+        limited.x = Mathf.Clamp(limited.x, -moveSpeed, moveSpeed);
+        limited.y = Mathf.Max(limited.y, -maxFallSpeed);
+        body.linearVelocity = limited;
     }
 
-    private bool HasGroundContact()
+    private bool FindGround(
+        ref Vector2 bestNormal,
+        ref Vector2 supportVelocity,
+        ref SurfaceEffector2D groundBelt)
     {
+        bool grounded = false;
         int count = body.GetContacts(contacts);
+
         for (int i = 0; i < count; i++)
         {
-            if (contacts[i].normal.y >= minimumGroundNormal)
+            ContactPoint2D contact = contacts[i];
+            if (contact.normal.y <= minimumGroundNormal ||
+                (grounded && contact.normal.y <= bestNormal.y))
             {
-                return true;
+                continue;
             }
+
+            Collider2D surface = contact.collider;
+            if (surface != null && surface.attachedRigidbody == body)
+            {
+                surface = contact.otherCollider;
+            }
+
+            Rigidbody2D support = surface != null ? surface.attachedRigidbody : null;
+            Vector2 velocity = support != null && support != body
+                ? support.GetPointVelocity(contact.point)
+                : Vector2.zero;
+
+            // Uphill travel has positive world Y while still on the slope.
+            // Only velocity away from the surface means the player took off.
+            if (Vector2.Dot(body.linearVelocity - velocity, contact.normal) > 0.3f)
+            {
+                continue;
+            }
+
+            bestNormal = contact.normal;
+            supportVelocity = velocity;
+            groundBelt = surface != null
+                ? surface.GetComponent<SurfaceEffector2D>()
+                : null;
+            grounded = true;
         }
-        return false;
+
+        return grounded;
+    }
+
+    private void DriveAlongBelt(
+        Vector2 tangent,
+        Vector2 supportVelocity,
+        SurfaceEffector2D groundBelt)
+    {
+        Vector2 velocity = body.linearVelocity;
+        float along = Vector2.Dot(velocity - supportVelocity, tangent);
+        Vector2 beltVelocity = (Vector2)groundBelt.transform.right * groundBelt.speed;
+        float target = Vector2.Dot(beltVelocity, tangent) + steer * moveSpeed;
+        float acceleration = Mathf.Abs(steer) > 0.01f ? groundAcceleration : 12f;
+        float driven = Mathf.MoveTowards(
+            along,
+            target,
+            acceleration * Time.fixedDeltaTime
+        );
+
+        // Change only tangent velocity, preserving gravity/contact response and
+        // vertical lift velocity. Jumping remains under player control.
+        body.linearVelocity = velocity + tangent * (driven - along);
     }
 
     private void ClearInput()
     {
-        horizontal = 0f;
+        steer = 0f;
         jumpRequestedUntil = float.NegativeInfinity;
-        jumpReleased = false;
     }
 
-    private void OnApplicationFocus(bool hasFocus)
+    protected virtual void OnApplicationFocus(bool hasFocus)
     {
         if (!hasFocus)
         {
             ClearInput();
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (body != null)
-        {
-            body.linearVelocity = Vector2.zero;
         }
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Level 2 shows the goal during the map preview. It remains locked, dimmed
+// Level 3 shows the goal during the map preview. It remains locked, dimmed
 // red, until every star is collected. Other levels keep their preview rule.
 public class ExitTrigger : MonoBehaviour
 {
@@ -46,7 +46,7 @@ public class ExitTrigger : MonoBehaviour
         GameManager manager = GameManager.Instance;
         if (spriteRenderer != null && manager != null)
         {
-            spriteRenderer.enabled = manager.IsLevel2 || !manager.IsPreviewing;
+            spriteRenderer.enabled = manager.IsLevel3 || !manager.IsPreviewing;
         }
     }
 

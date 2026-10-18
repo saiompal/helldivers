@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // Visual tread motion follows the existing conveyor effector without new physics.
-public sealed class Level2BeltMark : MonoBehaviour
+public sealed class Level3BeltMark : MonoBehaviour
 {
     private SurfaceEffector2D belt;
     private MapFlipController flip;

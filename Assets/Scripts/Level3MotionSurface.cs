@@ -4,7 +4,7 @@ using UnityEngine;
 // world rotation. They never animate during the initial map preview.
 [DefaultExecutionOrder(-200)]
 [RequireComponent(typeof(Rigidbody2D))]
-public sealed class Level2MotionSurface : MonoBehaviour
+public sealed class Level3MotionSurface : MonoBehaviour
 {
     [SerializeField] private Vector2 localTravel = new Vector2(0f, 2f);
     [SerializeField, Min(.1f)] private float cycleSeconds = 4f;
