@@ -6,17 +6,17 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-// Rebuilds Level 1 from the text map below: opens the scene, lays out the
+// Rebuilds Level 0 from the text map below: opens the scene, lays out the
 // side-on map, sets up the player's movement and circle of light, the map
 // flip and the HUD, then saves. Edit the map and run it again.
 //
 // The map is seen from the side and gravity pulls down the screen. The
 // tall wall in the middle can't be jumped, but its gap at the top is at
 // floor level once the map flips.
-// Run it from the menu: Tools > Level 1 > Build Level 1.
-public static class Level1Builder
+// Run it from the menu: Tools > Level 0 > Build Level 0.
+public static class Level0Builder
 {
-    internal const string ScenePath = "Assets/Scenes/Level1.unity";
+    internal const string ScenePath = "Assets/Scenes/Level0.unity";
 
     // # wall   . open space   S player start   E exit   * star
     // Row 0 is the top. Each character is one world unit. S and E are
@@ -58,23 +58,31 @@ public static class Level1Builder
     private const float VisionInnerRadius = 0.5f;
     private const float VisionOuterRadius = 2f;
 
-    // Player physics. Jump speed 14 with gravity scale 3 rises about 3.3
-    // units, enough for a 3-tile ledge but not 4.
+    // Shared accelerated player physics used by every current and future level.
     private const float PlayerGravityScale = 3f;
-    private const float PlayerMoveSpeed = 6f;
-    private const float PlayerJumpSpeed = 14f;
+    private const float PlayerMoveSpeed = 7.5f;
+    private const float PlayerGroundAcceleration = 38f;
+    private const float PlayerAirAcceleration = 12f;
+    private const float PlayerFlatGroundBraking = 13f;
+    private const float PlayerJumpSpeed = 13.2f;
+    private const float PlayerMaxFallSpeed = 22f;
+    private const float PlayerCoyoteSeconds = 0.1f;
+    private const float PlayerJumpBufferSeconds = 0.12f;
+    private const float PlayerMinimumGroundNormal = 0.45f;
     private const float PlayerBoxSize = 0.55f;
 
     private static readonly Vector2 ExitSize = new Vector2(1.4f, 2f);
 
-    // Orthographic size once the camera zooms in on the player.
+    // Normal dark-play framing and the wider view earned by spending F light.
     private const float FollowCameraSize = 4f;
+    private const float RevealCameraSize = 8f;
+    private const float RevealCameraZoomSeconds = 0.25f;
 
     private static readonly Color DefaultWallColor = new Color(0.83f, 0.83f, 0.83f);
     private static readonly Color VisionColor = new Color(1f, 0.95f, 0.85f);
     private static readonly Color StarGlowColor = new Color(1f, 0.82f, 0.3f);
 
-    [MenuItem("Tools/Level 1/Build Level 1")]
+    [MenuItem("Tools/Level 0/Build Level 0")]
     private static void BuildMenuItem()
     {
         if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -100,7 +108,7 @@ public static class Level1Builder
             exit == null || camera == null || gameManager == null)
         {
             Debug.LogError(
-                $"Level1Builder: {ScenePath} needs Floor, Walls, Player, an ExitTrigger, " +
+                $"Level0Builder: {ScenePath} needs Floor, Walls, Player, an ExitTrigger, " +
                 "Main Camera and GameManager objects."
             );
             return false;
@@ -108,7 +116,7 @@ public static class Level1Builder
 
         if (starSprite == null)
         {
-            Debug.LogError($"Level1Builder: no sprite found at {StarSpritePath}.");
+            Debug.LogError($"Level0Builder: no sprite found at {StarSpritePath}.");
             return false;
         }
 
@@ -117,7 +125,7 @@ public static class Level1Builder
 
         if (Layout.Any(row => row.Length != width))
         {
-            Debug.LogError("Level1Builder: every layout row must be the same length.");
+            Debug.LogError("Level0Builder: every layout row must be the same length.");
             return false;
         }
 
@@ -238,7 +246,7 @@ public static class Level1Builder
         EditorSceneManager.SaveScene(scene);
 
         Debug.Log(
-            $"Level1Builder: built a {width}x{height} map with {wallRects.Count} " +
+            $"Level0Builder: built a {width}x{height} map with {wallRects.Count} " +
             $"walls and {starCount} stars, and saved {ScenePath}."
         );
         return true;
@@ -302,7 +310,14 @@ public static class Level1Builder
 
         SerializedObject serialized = new SerializedObject(movement);
         serialized.FindProperty("moveSpeed").floatValue = PlayerMoveSpeed;
+        serialized.FindProperty("groundAcceleration").floatValue = PlayerGroundAcceleration;
+        serialized.FindProperty("airAcceleration").floatValue = PlayerAirAcceleration;
+        serialized.FindProperty("flatGroundBraking").floatValue = PlayerFlatGroundBraking;
         serialized.FindProperty("jumpSpeed").floatValue = PlayerJumpSpeed;
+        serialized.FindProperty("maxFallSpeed").floatValue = PlayerMaxFallSpeed;
+        serialized.FindProperty("coyoteSeconds").floatValue = PlayerCoyoteSeconds;
+        serialized.FindProperty("jumpBufferSeconds").floatValue = PlayerJumpBufferSeconds;
+        serialized.FindProperty("minimumGroundNormal").floatValue = PlayerMinimumGroundNormal;
         serialized.ApplyModifiedProperties();
     }
 
@@ -386,6 +401,8 @@ public static class Level1Builder
         serialized.FindProperty("mapBounds").objectReferenceValue = floor;
         serialized.FindProperty("mapFlip").objectReferenceValue = mapFlip;
         serialized.FindProperty("followSize").floatValue = FollowCameraSize;
+        serialized.FindProperty("revealSize").floatValue = RevealCameraSize;
+        serialized.FindProperty("revealZoomSeconds").floatValue = RevealCameraZoomSeconds;
         serialized.FindProperty("topBarShare").floatValue =
             HudBuilder.TopBarHeight / HudBuilder.ReferenceHeight;
         serialized.FindProperty("bottomBarShare").floatValue =
@@ -510,7 +527,7 @@ public static class Level1Builder
 
         if (tiles.Count == 0)
         {
-            Debug.LogWarning($"Level1Builder: layout has no '{marker}' tile.");
+            Debug.LogWarning($"Level0Builder: layout has no '{marker}' tile.");
             return false;
         }
 

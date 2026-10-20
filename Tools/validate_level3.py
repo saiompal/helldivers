@@ -3,7 +3,7 @@ from pathlib import Path
 import json,math,re,hashlib,collections
 ROOT=Path(__file__).resolve().parents[1]
 A=ROOT/'Assets'
-L=json.loads((A/'Resources/Level2RingLayout.json').read_text())
+L=json.loads((A/'Resources/Level3RingLayout.json').read_text())
 R=.275
 
 def corners(b):
@@ -32,7 +32,7 @@ def test_lift_sweeps():
   for block in L['blocks']:
    assert not overlap(corners(swept),corners(block)),(lift['name'],'hits',block['name'])
  # Full half-turns preserve these relative clearances; turns pause all movers.
- motion=(A/'Scripts/Level2MotionSurface.cs').read_text()
+ motion=(A/'Scripts/Level3MotionSurface.cs').read_text()
  assert 'body.simulated = false' in motion and 'flip.IsTurning' in motion
  assert 'CanPlayerMove' in motion
 
@@ -64,8 +64,9 @@ def test_physical_connectivity():
  print('  Free-space connectivity:',len(seen),'ball-center samples')
 
 def test_scene_references_and_appearance():
- s=(A/'Scenes/Level2.unity').read_text();s1=(A/'Scenes/Level1.unity').read_text()
+ s=(A/'Scenes/Level3.unity').read_text();s1=(A/'Scenes/Level0.unity').read_text()
  records={int(m[1]):m[2] for m in re.finditer(r'^--- !u!\d+ &(\d+)\n([\s\S]*?)(?=^---|\Z)',s,re.M)}
+ records1={int(m[1]):m[2] for m in re.finditer(r'^--- !u!\d+ &(\d+)\n([\s\S]*?)(?=^---|\Z)',s1,re.M)}
  assert len(records)==len(re.findall(r'^---',s,re.M)),'duplicate scene IDs'
  for match in re.finditer(r'^--- !u!(\d+) &\d+\n(\w+):',s,re.M):
   typ,name=match.groups();expected={'1':'GameObject','4':'Transform','212':'SpriteRenderer','61':'BoxCollider2D','58':'CircleCollider2D','50':'Rigidbody2D','114':'MonoBehaviour','251':'SurfaceEffector2D'}
@@ -75,20 +76,27 @@ def test_scene_references_and_appearance():
    if 'guid:' in line:continue
    for ref in map(int,re.findall(r'\{fileID: (\d+)\}',line)):
     if ref:assert ref in records,(id,'dangling reference',ref)
- for fid in [1177520541,74461905,74461906]:
-  def doc(text):return re.search(r'^--- !u!\d+ &'+str(fid)+r'\n([\s\S]*?)(?=^---|\Z)',text,re.M)[1]
-  assert doc(s)==doc(s1),f'Level 1 appearance/light record changed: {fid}'
- assert 'Assembly-CSharp::Level2SceneSetup' in s
+ # The player renderer keeps its stable ID. Vision Light component IDs differ
+ # between historical scene saves, so compare its serialized components after
+ # normalizing only their owning GameObject reference.
+ assert records[1177520541]==records1[1177520541],'Level 0 player appearance changed'
+ def named_components(rs,name):
+  go=next(body for body in rs.values() if body.startswith('GameObject:') and f'  m_Name: {name}\n' in body)
+  ids=list(map(int,re.findall(r'- component: \{fileID: (\d+)\}',go)))
+  return [re.sub(r'm_GameObject: \{fileID: \d+\}', 'm_GameObject: {fileID: 0}', rs[i]) for i in ids]
+ assert named_components(records,'Vision Light')==named_components(records1,'Vision Light'),'Level 0 vision light changed'
+ assert 'Assembly-CSharp::Level3SceneSetup' in s
  assert 'm_Name: Sector 5 / gap landing' in s
  assert len(re.findall(r'm_Name: Sector [1-5] / (?:conveyor control|lift transfer|inverted dogleg|offset jump|gap landing)\n',s))==5
  # Native UI shows progress: no duplicate IMGUI overlay.
- assert 'Assembly-CSharp::Level2StarHud' not in s
- assert 'starsText: {fileID: 489405416}' in s
- setup=(A/'Scripts/Level2SceneSetup.cs').read_text()
+ assert 'Assembly-CSharp::Level3StarHud' not in s
+ assert re.search(r'  starsText: \{fileID: [1-9]\d*\}',s)
+ assert '  m_Name: STARS\n' in s
+ setup=(A/'Scripts/Level3SceneSetup.cs').read_text()
  assert 'ballRenderer.color' not in setup and 'CircleSprite' not in setup
  assert 'light.pointLightOuterRadius = 2f;' in setup
  assert '1f / scale' in setup
- assert (A/'Art/Star.png').read_bytes()==(A/'Resources/Level2Star.png').read_bytes()
+ assert (A/'Art/Star.png').read_bytes()==(A/'Resources/Level3Star.png').read_bytes()
 
 def test_guid_uniqueness():
  guids=[]
@@ -105,8 +113,31 @@ def test_guid_uniqueness():
    if c in '})]':assert stack and stack.pop()=={'}':'{',')':'(',']':'['}[c],src
   assert not stack,src
 
+def test_shared_gameplay_standard():
+ movement=(A/'Scripts/PlayerMovement.cs').read_text()
+ assert 'groundAcceleration = 38f' in movement
+ assert 'airAcceleration = 12f' in movement
+ assert 'flatGroundBraking = 13f' in movement
+ assert 'class Level3BallMotor : PlayerMovement' in (A/'Scripts/Level3BallMotor.cs').read_text()
+ for level in range(4):
+  scene=(A/f'Scenes/Level{level}.unity').read_text()
+  for setting in ('followSize: 4','revealSize: 8','revealZoomSeconds: 0.25',
+                  'moveSpeed: 7.5','groundAcceleration: 38',
+                  'airAcceleration: 12','flatGroundBraking: 13','jumpSpeed: 13.2',
+                  'maxFallSpeed: 22','coyoteSeconds: 0.1',
+                  'jumpBufferSeconds: 0.12','minimumGroundNormal: 0.45'):
+   assert setting in scene,(level,setting)
+ manager=(A/'Scripts/GameManager.cs').read_text()
+ assert 'lightRadiusGrowthPerStar = 0.1f' in manager
+ assert '1f + starsCollected * lightRadiusGrowthPerStar' in manager
+ assert 'chargesRemaining++;' in manager
+ assert 'const string reward = "  \\u00B7  +1 light charge";' in manager
+ assert 'if (IsLevel3)\n        {\n            chargesRemaining++;' not in manager
+ assert 'cameraFollow.SetRevealView(true)' in manager
+ assert 'cameraFollow.SetRevealView(false)' in manager
 
-def test_level1_preserved():
+
+def test_level0_preserved():
  expected=json.loads((ROOT/'Tools/protected_base_hashes.json').read_text())
  for name,digest in expected.items():
   assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==digest,name+' changed'

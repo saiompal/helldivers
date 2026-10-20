@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
 
     public bool IsExitUnlocked => starsCollected >= starsTotal;
     public bool IsPreviewing => phase == Phase.Preview;
-    public bool IsLevel2 => gameObject.scene.name == "Level2";
+    public bool IsLevel3 => gameObject.scene.name == "Level3";
 
     // Fires once, when the last star is collected.
     public event Action ExitUnlocked;
@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour
     [SerializeField, Min(0)] private int revealCharges = 3;
     [Tooltip("Global light level while dark. The player's own light still shows a circle.")]
     [SerializeField, Range(0f, 1f)] private float darkIntensity = 0f;
+    [Tooltip("Each collected star adds this share of the light's original radius.")]
+    [SerializeField, Min(0f)] private float lightRadiusGrowthPerStar = 0.1f;
 
     [Header("Scenes")]
     [SerializeField] private string menuScene = "MainMenu";
@@ -42,7 +44,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private MapFlipController mapFlip;
     [Tooltip("Optional. Zooms in on the player when play starts.")]
     [SerializeField] private CameraFollow cameraFollow;
-    [Tooltip("Optional. Shows the remaining reveal charges as dots.")]
+    [Tooltip("Optional. Shows the remaining reveal-charge count.")]
     [SerializeField] private TMP_Text chargesText;
     [Tooltip("Optional. Shows stars collected out of the total.")]
     [SerializeField] private TMP_Text starsText;
@@ -59,7 +61,6 @@ public class GameManager : MonoBehaviour
     private const string LanternColor = "#FFD54A";
     private const string DangerColor = "#FF5A4F";
     private const string SuccessColor = "#5CE68A";
-    private const string SpentColor = "#FFFFFF33";
     private const float ToastSeconds = 1.5f;
 
     private Phase phase;
@@ -69,6 +70,9 @@ public class GameManager : MonoBehaviour
     private float runStartTime;
     private string toast;
     private float toastUntil;
+    private Light2D playerVisionLight;
+    private float initialVisionInnerRadius;
+    private float initialVisionOuterRadius;
 
     private bool IsActive =>
         phase == Phase.Playing ||
@@ -87,6 +91,7 @@ public class GameManager : MonoBehaviour
         // Counted here rather than in Start so the exit can read the lock
         // state from its own Start.
         starsTotal = FindObjectsByType<StarCollectible>(FindObjectsSortMode.None).Length;
+        CachePlayerVisionLight();
     }
 
     private void Start()
@@ -183,11 +188,19 @@ public class GameManager : MonoBehaviour
         phase = Phase.Revealing;
         chargesRemaining--;
         globalLight.intensity = 1f;
+        if (cameraFollow != null)
+        {
+            cameraFollow.SetRevealView(true);
+        }
         UpdateChargesText();
 
         yield return new WaitForSeconds(revealSeconds);
 
         globalLight.intensity = darkIntensity;
+        if (cameraFollow != null)
+        {
+            cameraFollow.SetRevealView(false);
+        }
         phase = Phase.Playing;
     }
 
@@ -199,17 +212,15 @@ public class GameManager : MonoBehaviour
         }
 
         starsCollected++;
+        UpdatePlayerVisionRadius();
         UpdateStarsText();
 
-        // Every Level 2 star earns one stored F reveal, including the fifth.
-        // Earned charges may exceed the three starting charges.
-        if (IsLevel2)
-        {
-            chargesRemaining++;
-            UpdateChargesText();
-        }
+        // Every star in every level earns one stored F reveal. Earned charges
+        // may exceed the three starting charges.
+        chargesRemaining++;
+        UpdateChargesText();
 
-        string reward = IsLevel2 ? "  \u00B7  +1 light charge" : string.Empty;
+        const string reward = "  \u00B7  +1 light charge";
 
         if (IsExitUnlocked)
         {
@@ -291,18 +302,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // A compact count keeps earned charges readable without overflowing
-        // the original three-dot space or creating a negative string length.
-        if (IsLevel2)
-        {
-            chargesText.text = $"<color={LanternColor}>\u25CF \u00D7 {chargesRemaining}</color>";
-            return;
-        }
-
-        int used = revealCharges - chargesRemaining;
+        // A compact count remains readable when star rewards take the total
+        // above the three starting charges.
         chargesText.text =
-            $"<color={LanternColor}>{new string('\u25CF', chargesRemaining)}</color>" +
-            $"<color={SpentColor}>{new string('\u25CF', used)}</color>";
+            $"<color={LanternColor}>\u25CF \u00D7 {chargesRemaining}</color>";
     }
 
     private void UpdateStarsText()
@@ -311,6 +314,48 @@ public class GameManager : MonoBehaviour
         {
             starsText.text = $"{starsCollected} / {starsTotal}";
         }
+    }
+
+    private void CachePlayerVisionLight()
+    {
+        PlayerMovement player = FindFirstObjectByType<PlayerMovement>();
+        if (player == null)
+        {
+            return;
+        }
+
+        Light2D[] lights = player.GetComponentsInChildren<Light2D>(true);
+        foreach (Light2D light in lights)
+        {
+            if (light.gameObject.name != "Vision Light")
+            {
+                continue;
+            }
+
+            playerVisionLight = light;
+            initialVisionInnerRadius = light.pointLightInnerRadius;
+            initialVisionOuterRadius = light.pointLightOuterRadius;
+            return;
+        }
+    }
+
+    private void UpdatePlayerVisionRadius()
+    {
+        if (playerVisionLight == null)
+        {
+            CachePlayerVisionLight();
+        }
+
+        if (playerVisionLight == null)
+        {
+            return;
+        }
+
+        // Always grow from the starting radii: 110%, 120%, 130%, ...
+        // This deliberately does not compound the previous star's increase.
+        float scale = 1f + starsCollected * lightRadiusGrowthPerStar;
+        playerVisionLight.pointLightInnerRadius = initialVisionInnerRadius * scale;
+        playerVisionLight.pointLightOuterRadius = initialVisionOuterRadius * scale;
     }
 
     private void WinLevel()

@@ -3,10 +3,10 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-// Level 2 starts from the unmodified Level 1 scene. All layout coordinates live
+// Level 3 starts from the unmodified Level 0 scene. All layout coordinates live
 // in one resource, shared by the editor baker and non-Unity geometry checks.
 [DefaultExecutionOrder(-10000)]
-public sealed class Level2SceneSetup : MonoBehaviour
+public sealed class Level3SceneSetup : MonoBehaviour
 {
     [Serializable] public sealed class Block
     {
@@ -40,12 +40,12 @@ public sealed class Level2SceneSetup : MonoBehaviour
 
     private void Awake()
     {
-        if (SceneManager.GetActiveScene().name == "Level2") Rebuild();
+        if (SceneManager.GetActiveScene().name == "Level3") Rebuild();
     }
 
     public void Rebuild()
     {
-        TextAsset data = Resources.Load<TextAsset>("Level2RingLayout");
+        TextAsset data = Resources.Load<TextAsset>("Level3RingLayout");
         Layout layout = data != null ? JsonUtility.FromJson<Layout>(data.text) : null;
         GameObject map = GameObject.Find("Map");
         GameObject walls = GameObject.Find("Walls");
@@ -55,7 +55,7 @@ public sealed class Level2SceneSetup : MonoBehaviour
         if (layout == null || layout.stars == null || layout.stars.Length != 5 ||
             map == null || walls == null || floor == null || player == null || exit == null)
         {
-            Debug.LogError("Ring Exchange requires Level 1's scene rig and Level2RingLayout with five stars.");
+            Debug.LogError("Ring Exchange requires Level 0's scene rig and Level3RingLayout with five stars.");
             return;
         }
 
@@ -77,10 +77,10 @@ public sealed class Level2SceneSetup : MonoBehaviour
         if (old != null) Remove(old.gameObject);
         generated = new GameObject("L2 Generated Geometry").transform;
         generated.SetParent(map.transform, false);
-        grip = Resources.Load<PhysicsMaterial2D>("Level2Rolling");
-        if (grip == null) grip = new PhysicsMaterial2D("Level 2 Rolling") { friction = .65f, bounciness = 0f };
+        grip = Resources.Load<PhysicsMaterial2D>("Level3Rolling");
+        if (grip == null) grip = new PhysicsMaterial2D("Level 3 Rolling") { friction = .65f, bounciness = 0f };
 
-        // Preserve Level 1's materials, background and player appearance.
+        // Preserve Level 0's materials, background and player appearance.
         floor.transform.localPosition = Vector3.zero;
         floor.transform.localScale = new Vector3(layout.width, layout.height, 1f);
         ConfigureBall(player, layout);
@@ -110,8 +110,11 @@ public sealed class Level2SceneSetup : MonoBehaviour
         // Do not override the original sprite, tint, material or .65 scale.
         Transform mark = player.transform.Find("Rolling indicator");
         if (mark != null) Remove(mark.gameObject);
-        PlayerMovement original = player.GetComponent<PlayerMovement>();
-        if (original != null) { original.enabled = false; Remove(original); }
+        // Movement is shared with every other level. Existing Level 3 scenes
+        // may carry the compatibility subclass, which also satisfies this.
+        PlayerMovement movement = player.GetComponent<PlayerMovement>();
+        if (movement == null) movement = player.AddComponent<PlayerMovement>();
+        movement.enabled = true;
         BoxCollider2D box = player.GetComponent<BoxCollider2D>();
         if (box != null) { box.enabled = false; Remove(box); }
         CircleCollider2D circle = player.GetComponent<CircleCollider2D>();
@@ -127,9 +130,7 @@ public sealed class Level2SceneSetup : MonoBehaviour
         body.sharedMaterial = grip;
         body.interpolation = RigidbodyInterpolation2D.Interpolate;
         body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        if (player.GetComponent<Level2BallMotor>() == null) player.AddComponent<Level2BallMotor>();
-
-        // Level 1 light's .65 player scale * 1.5384616 child scale = 1.
+        // Level 0 light's .65 player scale * 1.5384616 child scale = 1.
         // Keep the light fixed in world size even if player scale is adjusted.
         Transform vision = player.transform.Find("Vision Light");
         if (vision != null)
@@ -186,7 +187,7 @@ public sealed class Level2SceneSetup : MonoBehaviour
             GameObject tread = Shape("Belt tread", go.transform, new Vector2(x, 0f),
                 new Vector2(.20f / block.w, .13f), new Color(.22f, .26f, .28f));
             tread.GetComponent<SpriteRenderer>().sortingOrder = 2;
-            tread.AddComponent<Level2BeltMark>();
+            tread.AddComponent<Level3BeltMark>();
         }
     }
 
@@ -198,7 +199,7 @@ public sealed class Level2SceneSetup : MonoBehaviour
         go.AddComponent<BoxCollider2D>().sharedMaterial = grip;
         Rigidbody2D body = go.AddComponent<Rigidbody2D>();
         body.bodyType = RigidbodyType2D.Kinematic;
-        Level2MotionSurface motion = go.AddComponent<Level2MotionSurface>();
+        Level3MotionSurface motion = go.AddComponent<Level3MotionSurface>();
         motion.SetShuttle(new Vector2(0f, lift.range), lift.period, lift.phase);
     }
 
@@ -209,7 +210,7 @@ public sealed class Level2SceneSetup : MonoBehaviour
         star.transform.localPosition = new Vector2(pickup.x, pickup.y);
         star.transform.localScale = Vector3.one * .7f;
         SpriteRenderer renderer = star.AddComponent<SpriteRenderer>();
-        renderer.sprite = Resources.Load<Sprite>("Level2Star");
+        renderer.sprite = Resources.Load<Sprite>("Level3Star");
         renderer.sharedMaterial = litMaterial;
         renderer.color = Color.white;
         renderer.sortingOrder = 6;

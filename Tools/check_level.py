@@ -1,18 +1,18 @@
 # Rough reachability check for a level layout, using the same numbers as
-# PlayerMovement and Level1Builder (keep them in sync if you retune).
+# PlayerMovement and Level0Builder (keep them in sync if you retune).
 # It simulates running, jumping and the 180-degree map flip, then reports
 # whether the exit and stars can be reached, whether the exit needs a flip,
 # and whether any reachable spot can no longer reach the exit (a soft-lock).
 # The exit only opens once every star is collected, as in the game.
 #
-#   python3 Tools/check_level.py Assets/Editor/Level1Builder.cs
+#   python3 Tools/check_level.py Assets/Editor/Level0Builder.cs
 #
 # Layout chars: # solid, . open, S start, E exit, * star.
 import sys, math, collections
 G = 9.81 * 3.0      # gravityScale 3
-JUMP = 14.0
-SPEED = 6.0
-MAXFALL = 18.0
+JUMP = 13.2
+SPEED = 7.5
+MAXFALL = 22.0
 HALF = 0.275        # half the player box (0.55 world units)
 DT = 0.02
 STEPS = 3           # physics steps per decision

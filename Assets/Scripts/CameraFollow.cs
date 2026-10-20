@@ -17,6 +17,9 @@ public class CameraFollow : MonoBehaviour
     [Header("Zoom")]
     [Tooltip("Orthographic size while following. Smaller shows less of the map.")]
     [SerializeField, Min(1f)] private float followSize = 4f;
+    [Tooltip("Temporary wider view while an F light reveal is active.")]
+    [SerializeField, Min(1f)] private float revealSize = 8f;
+    [SerializeField, Min(0.05f)] private float revealZoomSeconds = 0.25f;
     [SerializeField, Min(0.05f)] private float zoomSeconds = 1f;
     [SerializeField, Min(0f)] private float followSmoothing = 0.12f;
 
@@ -31,6 +34,8 @@ public class CameraFollow : MonoBehaviour
     private float overviewSize;
     private float blend;
     private float targetBlend;
+    private float currentFollowSize;
+    private float targetFollowSize;
     private Vector2 focus;
     private Vector2 focusVelocity;
 
@@ -41,6 +46,8 @@ public class CameraFollow : MonoBehaviour
         // The level builder frames the whole map, so that's the overview.
         overviewPosition = transform.position;
         overviewSize = view.orthographicSize;
+        currentFollowSize = followSize;
+        targetFollowSize = followSize;
 
         if (target != null)
         {
@@ -58,6 +65,11 @@ public class CameraFollow : MonoBehaviour
         targetBlend = 0f;
     }
 
+    public void SetRevealView(bool revealing)
+    {
+        targetFollowSize = revealing ? revealSize : followSize;
+    }
+
     private void LateUpdate()
     {
         if (target == null)
@@ -67,6 +79,13 @@ public class CameraFollow : MonoBehaviour
 
         blend = Mathf.MoveTowards(blend, targetBlend, Time.deltaTime / zoomSeconds);
         float eased = blend * blend * (3f - 2f * blend);
+        float revealZoomSpeed = Mathf.Abs(revealSize - followSize) /
+                                Mathf.Max(0.05f, revealZoomSeconds);
+        currentFollowSize = Mathf.MoveTowards(
+            currentFollowSize,
+            targetFollowSize,
+            revealZoomSpeed * Time.deltaTime
+        );
 
         // While the map turns the player swings across it, so follow them
         // exactly; smoothing would sweep the view over the whole map.
@@ -81,7 +100,7 @@ public class CameraFollow : MonoBehaviour
             focus = Vector2.SmoothDamp(focus, target.position, ref focusVelocity, followSmoothing);
         }
 
-        float size = Mathf.Lerp(overviewSize, followSize, eased);
+        float size = Mathf.Lerp(overviewSize, currentFollowSize, eased);
         Vector3 followPosition = PositionFor(focus, size);
 
         view.orthographicSize = size;
