@@ -595,7 +595,8 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    WebGL: LEVELPLAY_DEPENDENCIES_INSTALLED
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -697,7 +698,7 @@ PlayerSettings:
   cloudProjectId: 82a8509c-4483-4f48-87f5-03a74016f324
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: My project
+  projectName: In the Dark
   organizationId: saiompal
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

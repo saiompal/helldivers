@@ -10,16 +10,19 @@ EditorBuildSettings:
     guid: 5e404b438e936478e9b29b3768cb9c5d
   - enabled: 1
     path: Assets/Scenes/Level0.unity
-    guid: c3b95acc8a9814b55a67b60b4540cd43
+    guid: b4659be16773f40178cbe2e350e81a09
   - enabled: 1
     path: Assets/Scenes/Level1.unity
-    guid: fee089b828d6ff645a25860b2fc83a66
+    guid: 85901628f67c245da94d6df2504c93d5
   - enabled: 1
     path: Assets/Scenes/Level2.unity
-    guid: 8ea670fc56dac1746b9eb2a198545917
+    guid: d608537acc5cc42b3915cca4fdc53cac
   - enabled: 1
     path: Assets/Scenes/Level3.unity
-    guid: 6351f7f396214fa497ca2ef6223088e8
+    guid: 722e31a44f56949b1a8f8f4dfe46feb9
+  - enabled: 1
+    path: /Users/sapal/helldivers/Assets/Scenes/Level1.unity
+    guid: c3b95acc8a9814b55a67b60b4540cd43
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

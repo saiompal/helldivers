@@ -47,6 +47,7 @@ The main menu has matching Level 0 through Level 3 buttons plus Quit. `MainMenuB
 - `Assets/Scripts/StarCollectible.cs`, `ExitTrigger.cs`, `PulsingGlow.cs`: pickup, locked/unlocked exit behavior, and visual pulse.
 - `Assets/Scripts/Hazard.cs`, `PortalController.cs`: optional hazard failure and paired teleport support.
 - `Assets/Scripts/MainMenu.cs`: serialized level buttons, Quit behavior, and initial UI selection.
+- `Assets/Scripts/GameAnalytics.cs`: sole wrapper around Unity Gaming Services Analytics (`com.unity.services.analytics`); `GameManager` records level start/star/reveal/complete/fail/restart/quit events through it. Event schemas must also exist in the UGS dashboard; see `ANALYTICS.md`.
 
 ## Level 0
 

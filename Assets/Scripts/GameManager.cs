@@ -68,6 +68,10 @@ public class GameManager : MonoBehaviour
     private int starsCollected;
     private int starsTotal;
     private float runStartTime;
+    private float runEndTime;
+    private string levelName;
+    private int attempt;
+    private int revealsUsed;
     private string toast;
     private float toastUntil;
     private Light2D playerVisionLight;
@@ -78,6 +82,15 @@ public class GameManager : MonoBehaviour
         phase == Phase.Playing ||
         phase == Phase.Revealing;
 
+    private float RunSeconds => phase switch
+    {
+        Phase.Preview => 0f,
+        Phase.Won or Phase.Failed => runEndTime - runStartTime,
+        _ => Time.time - runStartTime
+    };
+
+    private int FlipCount => mapFlip != null ? mapFlip.FlipCount : 0;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -87,6 +100,7 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
+        levelName = gameObject.scene.name;
 
         // Counted here rather than in Start so the exit can read the lock
         // state from its own Start.
@@ -108,6 +122,12 @@ public class GameManager : MonoBehaviour
         chargesRemaining = revealCharges;
         UpdateChargesText();
         UpdateStarsText();
+
+        attempt = GameAnalytics.NextAttempt(levelName);
+        GameAnalytics.Record("levelStart",
+            ("levelName", levelName),
+            ("attempt", attempt));
+
         StartCoroutine(BeginLevel());
     }
 
@@ -136,6 +156,8 @@ public class GameManager : MonoBehaviour
         if (keyboard.escapeKey.wasPressedThisFrame &&
             Application.CanStreamedLevelBeLoaded(menuScene))
         {
+            RecordLeftLevel("levelQuit");
+            GameAnalytics.Flush();
             SceneManager.LoadScene(menuScene);
         }
 
@@ -187,12 +209,19 @@ public class GameManager : MonoBehaviour
     {
         phase = Phase.Revealing;
         chargesRemaining--;
+        revealsUsed++;
         globalLight.intensity = 1f;
         if (cameraFollow != null)
         {
             cameraFollow.SetRevealView(true);
         }
         UpdateChargesText();
+
+        GameAnalytics.Record("revealUsed",
+            ("levelName", levelName),
+            ("runSeconds", RunSeconds),
+            ("starsCollected", starsCollected),
+            ("chargesRemaining", chargesRemaining));
 
         yield return new WaitForSeconds(revealSeconds);
 
@@ -219,6 +248,12 @@ public class GameManager : MonoBehaviour
         // may exceed the three starting charges.
         chargesRemaining++;
         UpdateChargesText();
+
+        GameAnalytics.Record("starCollected",
+            ("levelName", levelName),
+            ("runSeconds", RunSeconds),
+            ("starsCollected", starsCollected),
+            ("starsTotal", starsTotal));
 
         const string reward = "  \u00B7  +1 light charge";
 
@@ -367,7 +402,17 @@ public class GameManager : MonoBehaviour
 
         EndRun(Phase.Won);
 
-        float runSeconds = Time.time - runStartTime;
+        float runSeconds = RunSeconds;
+        GameAnalytics.Record("levelCompleted",
+            ("levelName", levelName),
+            ("attempt", attempt),
+            ("runSeconds", runSeconds),
+            ("starsCollected", starsCollected),
+            ("starsTotal", starsTotal),
+            ("revealsUsed", revealsUsed),
+            ("flipCount", FlipCount));
+        GameAnalytics.Flush();
+
         string next = HasNextLevel()
             ? "N  next level   \u00B7   R  replay"
             : "R  replay   \u00B7   Esc  menu";
@@ -384,6 +429,16 @@ public class GameManager : MonoBehaviour
         }
 
         EndRun(Phase.Failed);
+        GameAnalytics.Record("levelFailed",
+            ("levelName", levelName),
+            ("attempt", attempt),
+            ("failReason", reason),
+            ("runSeconds", RunSeconds),
+            ("starsCollected", starsCollected),
+            ("revealsUsed", revealsUsed),
+            ("flipCount", FlipCount));
+        GameAnalytics.Flush();
+
         statusText.text =
             $"<color={DangerColor}>{reason}</color>   Press R to try again";
     }
@@ -398,6 +453,7 @@ public class GameManager : MonoBehaviour
         }
 
         phase = outcome;
+        runEndTime = Time.time;
         globalLight.intensity = 1f;
 
         // Pull back to show the whole route.
@@ -409,8 +465,24 @@ public class GameManager : MonoBehaviour
 
     public void RestartLevel()
     {
+        RecordLeftLevel("levelRestarted");
+
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.buildIndex);
+    }
+
+    // Restarting or quitting records how far the run got, including runs
+    // that had already been won or failed.
+    private void RecordLeftLevel(string eventName)
+    {
+        GameAnalytics.Record(eventName,
+            ("levelName", levelName),
+            ("attempt", attempt),
+            ("phase", phase.ToString()),
+            ("runSeconds", RunSeconds),
+            ("starsCollected", starsCollected),
+            ("revealsUsed", revealsUsed),
+            ("flipCount", FlipCount));
     }
 
     private static bool HasNextLevel()
