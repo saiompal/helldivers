@@ -64,7 +64,7 @@ public static class Level0Builder
     private const float PlayerGroundAcceleration = 38f;
     private const float PlayerAirAcceleration = 12f;
     private const float PlayerFlatGroundBraking = 13f;
-    private const float PlayerJumpSpeed = 13.2f;
+    private const float PlayerJumpSpeed = 15f;
     private const float PlayerMaxFallSpeed = 22f;
     private const float PlayerCoyoteSeconds = 0.1f;
     private const float PlayerJumpBufferSeconds = 0.12f;

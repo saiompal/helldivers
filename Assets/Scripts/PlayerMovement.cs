@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, Min(0f)] private float flatGroundBraking = 13f;
 
     [Header("Jumping")]
-    [SerializeField, Min(0f)] private float jumpSpeed = 13.2f;
+    [SerializeField, Min(0f)] private float jumpSpeed = 15f;
     [SerializeField, Min(0f)] private float maxFallSpeed = 22f;
     [Tooltip("A jump still works this long after running off a ledge.")]
     [SerializeField, Min(0f)] private float coyoteSeconds = 0.1f;

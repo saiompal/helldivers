@@ -123,7 +123,7 @@ def test_shared_gameplay_standard():
   scene=(A/f'Scenes/Level{level}.unity').read_text()
   for setting in ('followSize: 4','revealSize: 8','revealZoomSeconds: 0.25',
                   'moveSpeed: 7.5','groundAcceleration: 38',
-                  'airAcceleration: 12','flatGroundBraking: 13','jumpSpeed: 13.2',
+                  'airAcceleration: 12','flatGroundBraking: 13','jumpSpeed: 15',
                   'maxFallSpeed: 22','coyoteSeconds: 0.1',
                   'jumpBufferSeconds: 0.12','minimumGroundNormal: 0.45'):
    assert setting in scene,(level,setting)
@@ -146,10 +146,10 @@ def test_first_lift_boarding_bound():
  # Initial west-lift ascent: at the jump apex its top must be below the
  # ball's feet. This only checks the initial height budget, not a playthrough.
  lift=next(l for l in L['lifts'] if l['name']=='West ring lift')
- apex_time=13.2/29.43
+ apex_time=15/29.43
  lift_top=lift['y']+lift['range']*math.sin(2*math.pi*apex_time/lift['period']+lift['phase'])+lift['h']/2
  floor_top=-11.55+.9/2
- jump_height=13.2**2/(2*29.43)
+ jump_height=15**2/(2*29.43)
  assert lift_top-floor_top<jump_height,(lift_top-floor_top,jump_height)
 
 if __name__=='__main__':

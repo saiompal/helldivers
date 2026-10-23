@@ -43,7 +43,7 @@ The main menu has matching Level 0 through Level 3 buttons plus Quit. `MainMenuB
 - `Assets/Scripts/GameManager.cs`: singleton level state machine; preview/reveal/play/win/fail phases, input for F/R/Esc/N, star counts, additive per-star proximity-light growth, universal per-star charge rewards, exit unlock, and HUD text.
 - `Assets/Scripts/MapFlipController.cs`: timed warning/turn cycle; rotates the map root and player around the map center, suspends player physics during the turn, exposes phase/timing state and `Flipped`.
 - `Assets/Scripts/CameraFollow.cs`: overview-to-follow zoom, normal size-4 framing, temporary size-8 F-reveal framing, bounds clamping, HUD offset, and exact following during flips.
-- `Assets/Scripts/PlayerMovement.cs`: shared accelerated run/jump controller for every current and future level (7.5 maximum horizontal speed, 38 ground acceleration, 12 air acceleration, 13 flat-ground braking, 13.2 jump speed, coyote time, and jump buffer). It also handles slopes, conveyors, moving support velocity, and lift-aware jumps.
+- `Assets/Scripts/PlayerMovement.cs`: shared accelerated run/jump controller for every current and future level (7.5 maximum horizontal speed, 38 ground acceleration, 12 air acceleration, 13 flat-ground braking, 15 jump speed, coyote time, and jump buffer). It also handles slopes, conveyors, moving support velocity, and lift-aware jumps.
 - `Assets/Scripts/StarCollectible.cs`, `ExitTrigger.cs`, `PulsingGlow.cs`: pickup, locked/unlocked exit behavior, and visual pulse.
 - `Assets/Scripts/Hazard.cs`, `PortalController.cs`: optional hazard failure and paired teleport support.
 - `Assets/Scripts/MainMenu.cs`: serialized level buttons, Quit behavior, and initial UI selection.

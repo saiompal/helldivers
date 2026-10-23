@@ -5346,7 +5346,7 @@ MonoBehaviour:
   groundAcceleration: 38
   airAcceleration: 12
   flatGroundBraking: 13
-  jumpSpeed: 13.2
+  jumpSpeed: 15
   maxFallSpeed: 22
   coyoteSeconds: 0.1
   jumpBufferSeconds: 0.12

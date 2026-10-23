@@ -10,7 +10,7 @@
 # Layout chars: # solid, . open, S start, E exit, * star.
 import sys, math, collections
 G = 9.81 * 3.0      # gravityScale 3
-JUMP = 13.2
+JUMP = 15.0
 SPEED = 7.5
 MAXFALL = 22.0
 HALF = 0.275        # half the player box (0.55 world units)
