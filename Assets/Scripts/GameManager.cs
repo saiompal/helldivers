@@ -18,6 +18,11 @@ public class GameManager : MonoBehaviour
 
     public bool IsExitUnlocked => starsCollected >= starsTotal;
     public bool IsPreviewing => phase == Phase.Preview;
+    public bool IsPlaying => IsActive;
+    public bool IsFinished => phase == Phase.Won || phase == Phase.Failed;
+    public int StarsCollected => starsCollected;
+    public int RevealsUsed => revealsUsed;
+    public bool IsTutorial => gameObject.scene.name == "Tutorial";
     public bool IsLevel3 => gameObject.scene.name == "Level3";
 
     // Fires once, when the last star is collected.
@@ -33,7 +38,7 @@ public class GameManager : MonoBehaviour
     [Tooltip("Global light level while dark. The player's own light still shows a circle.")]
     [SerializeField, Range(0f, 1f)] private float darkIntensity = 0f;
     [Tooltip("Each collected star adds this share of the light's original radius.")]
-    [SerializeField, Min(0f)] private float lightRadiusGrowthPerStar = 0.1f;
+    [SerializeField, Min(0f)] private float lightRadiusGrowthPerStar = 0.3f;
 
     [Header("Scenes")]
     [SerializeField] private string menuScene = "MainMenu";
@@ -75,6 +80,9 @@ public class GameManager : MonoBehaviour
     private int revealsUsed;
     private string toast;
     private float toastUntil;
+    private Coroutine chargesPulse;
+    private float targetVisionScale = 1f;
+    private float currentVisionScale = 1f;
     private Light2D playerVisionLight;
     private float initialVisionInnerRadius;
     private float initialVisionOuterRadius;
@@ -192,10 +200,26 @@ public class GameManager : MonoBehaviour
             HandleInput(keyboard);
         }
 
+        AnimateVisionRadius();
+
         if (IsActive)
         {
             UpdateStatusText();
         }
+    }
+
+    private void AnimateVisionRadius()
+    {
+        if (playerVisionLight == null ||
+            Mathf.Approximately(currentVisionScale, targetVisionScale))
+        {
+            return;
+        }
+
+        currentVisionScale = Mathf.MoveTowards(
+            currentVisionScale, targetVisionScale, 1.5f * Time.deltaTime);
+        playerVisionLight.pointLightInnerRadius = initialVisionInnerRadius * currentVisionScale;
+        playerVisionLight.pointLightOuterRadius = initialVisionOuterRadius * currentVisionScale;
     }
 
     private void HandleInput(Keyboard keyboard)
@@ -233,13 +257,27 @@ public class GameManager : MonoBehaviour
 
         float timeRemaining = previewSeconds;
 
+        // The countdown sits in the middle of the screen, where it gets
+        // read, instead of in the top bar. It's see-through so the map
+        // underneath can still be studied.
+        TMP_Text countdown = CreateCountdownText();
+        statusText.text = string.Empty;
+
         while (timeRemaining > 0f)
         {
-            statusText.text =
-                $"Memorize the level   <b>{Mathf.CeilToInt(timeRemaining)}</b>";
+            if (countdown != null)
+            {
+                countdown.text =
+                    $"<size=40%>MEMORIZE</size>\n<b>{Mathf.CeilToInt(timeRemaining)}</b>";
+            }
 
             timeRemaining -= Time.deltaTime;
             yield return null;
+        }
+
+        if (countdown != null)
+        {
+            Destroy(countdown.gameObject);
         }
 
         globalLight.intensity = darkIntensity;
@@ -255,6 +293,32 @@ public class GameManager : MonoBehaviour
         {
             mapFlip.Begin();
         }
+    }
+
+    private TMP_Text CreateCountdownText()
+    {
+        if (statusText.canvas == null)
+        {
+            return null;
+        }
+
+        GameObject go = new GameObject("Memorize Countdown", typeof(RectTransform));
+        go.transform.SetParent(statusText.canvas.rootCanvas.transform, false);
+
+        RectTransform rect = (RectTransform)go.transform;
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = Vector2.zero;
+        rect.sizeDelta = new Vector2(900f, 400f);
+
+        TextMeshProUGUI text = go.AddComponent<TextMeshProUGUI>();
+        text.fontSize = 200f;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = new Color(1f, 1f, 1f, 0.6f);
+        text.outlineWidth = 0.2f;
+        text.outlineColor = new Color32(0, 0, 0, 200);
+        text.raycastTarget = false;
+        return text;
     }
 
     private IEnumerator TemporaryReveal()
@@ -300,6 +364,7 @@ public class GameManager : MonoBehaviour
         // may exceed the three starting charges.
         chargesRemaining++;
         UpdateChargesText();
+        ShowChargeGained();
 
         GameAnalytics.Record("starCollected",
             ("levelName", levelName),
@@ -322,6 +387,45 @@ public class GameManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    // Tells the player the star gave them a light charge: a "+1 light" that
+    // floats up from the player, and a pop on the charge counter in the HUD.
+    private void ShowChargeGained()
+    {
+        PlayerMovement player = FindFirstObjectByType<PlayerMovement>();
+        if (player != null)
+        {
+            FloatingText.Spawn(
+                player.transform.position + Vector3.up * 0.8f,
+                "+1 light");
+        }
+
+        if (chargesText != null)
+        {
+            if (chargesPulse != null)
+            {
+                StopCoroutine(chargesPulse);
+            }
+            chargesPulse = StartCoroutine(PulseChargesText());
+        }
+    }
+
+    private IEnumerator PulseChargesText()
+    {
+        const float seconds = 0.5f;
+        Transform target = chargesText.transform;
+
+        for (float age = 0f; age < seconds; age += Time.deltaTime)
+        {
+            // Jumps to 1.8x and eases back down.
+            float t = age / seconds;
+            target.localScale = Vector3.one * (1f + 0.8f * (1f - t) * (1f - t));
+            yield return null;
+        }
+
+        target.localScale = Vector3.one;
+        chargesPulse = null;
     }
 
     // Called when the player touches the exit.
@@ -440,9 +544,9 @@ public class GameManager : MonoBehaviour
 
         // Always grow from the starting radii: 110%, 120%, 130%, ...
         // This deliberately does not compound the previous star's increase.
-        float scale = 1f + starsCollected * lightRadiusGrowthPerStar;
-        playerVisionLight.pointLightInnerRadius = initialVisionInnerRadius * scale;
-        playerVisionLight.pointLightOuterRadius = initialVisionOuterRadius * scale;
+        // The light swells to the new size over a moment (see
+        // AnimateVisionRadius) so the growth is easy to notice.
+        targetVisionScale = 1f + starsCollected * lightRadiusGrowthPerStar;
     }
 
     private void WinLevel()
@@ -498,6 +602,11 @@ public class GameManager : MonoBehaviour
     private void EndRun(Phase outcome)
     {
         StopAllCoroutines();
+        chargesPulse = null;
+        if (chargesText != null)
+        {
+            chargesText.transform.localScale = Vector3.one;
+        }
 
         if (mapFlip != null)
         {

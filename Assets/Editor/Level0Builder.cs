@@ -22,7 +22,7 @@ public static class Level0Builder
     // Row 0 is the top. Each character is one world unit. S and E are
     // placed at the centre of all tiles with that letter; each touching
     // group of * is one star. The player can jump about 3 tiles high.
-    private static readonly string[] Layout =
+    private static readonly string[] Level0Layout =
     {
         "##################################",
         "#................................#",
@@ -44,6 +44,12 @@ public static class Level0Builder
         "#SS...#...###...#.....###.....EE.#",
         "##################################",
     };
+
+    // The layout and timing in use by the current build. Level 0 by default;
+    // TutorialBuilder swaps in its own.
+    private static string[] Layout = Level0Layout;
+    private static float previewSeconds = PreviewSeconds;
+    private static float secondsBetweenFlips = SecondsBetweenFlips;
 
     private const string StarSpritePath = "Assets/Art/Star.png";
     private const string PlayerMaterialPath = "Assets/Physics/PlayerNoFriction.physicsMaterial2D";
@@ -93,7 +99,17 @@ public static class Level0Builder
 
     internal static bool Build()
     {
-        Scene scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        return Build(ScenePath, Level0Layout, PreviewSeconds, SecondsBetweenFlips);
+    }
+
+    // Lays out any level scene from a text map and saves it.
+    internal static bool Build(
+        string scenePath, string[] layout, float preview, float flipInterval)
+    {
+        Layout = layout;
+        previewSeconds = preview;
+        secondsBetweenFlips = flipInterval;
+        Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
 
         GameObject floor = GameObject.Find("Floor");
         GameObject walls = GameObject.Find("Walls");
@@ -108,7 +124,7 @@ public static class Level0Builder
             exit == null || camera == null || gameManager == null)
         {
             Debug.LogError(
-                $"Level0Builder: {ScenePath} needs Floor, Walls, Player, an ExitTrigger, " +
+                $"Level0Builder: {scenePath} needs Floor, Walls, Player, an ExitTrigger, " +
                 "Main Camera and GameManager objects."
             );
             return false;
@@ -247,7 +263,7 @@ public static class Level0Builder
 
         Debug.Log(
             $"Level0Builder: built a {width}x{height} map with {wallRects.Count} " +
-            $"walls and {starCount} stars, and saved {ScenePath}."
+            $"walls and {starCount} stars, and saved {scenePath}."
         );
         return true;
     }
@@ -381,7 +397,7 @@ public static class Level0Builder
         serialized.FindProperty("mapRoot").objectReferenceValue = map;
         serialized.FindProperty("player").objectReferenceValue = player.GetComponent<Rigidbody2D>();
         serialized.FindProperty("visionLight").objectReferenceValue = visionLight;
-        serialized.FindProperty("secondsBetweenFlips").floatValue = SecondsBetweenFlips;
+        serialized.FindProperty("secondsBetweenFlips").floatValue = secondsBetweenFlips;
         serialized.FindProperty("warningSeconds").floatValue = FlipWarningSeconds;
         serialized.ApplyModifiedProperties();
         return mapFlip;
@@ -415,7 +431,7 @@ public static class Level0Builder
         GameManager gameManager, MapFlipController mapFlip, CameraFollow cameraFollow)
     {
         SerializedObject serialized = new SerializedObject(gameManager);
-        serialized.FindProperty("previewSeconds").floatValue = PreviewSeconds;
+        serialized.FindProperty("previewSeconds").floatValue = previewSeconds;
         serialized.FindProperty("revealSeconds").floatValue = RevealSeconds;
         serialized.FindProperty("revealCharges").intValue = RevealCharges;
         serialized.FindProperty("darkIntensity").floatValue = 0f;

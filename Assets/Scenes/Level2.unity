@@ -5121,7 +5121,7 @@ MonoBehaviour:
   revealSeconds: 2
   revealCharges: 3
   darkIntensity: 0
-  lightRadiusGrowthPerStar: 0.1
+  lightRadiusGrowthPerStar: 0.3
   menuScene: MainMenu
   globalLight: {fileID: 619394801}
   statusText: {fileID: 400044403}

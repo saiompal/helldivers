@@ -85,6 +85,16 @@ public class MapFlipController : MonoBehaviour
         CurrentPhase = Phase.Counting;
     }
 
+    // Skips the wait and starts the red warning now. Used by the tutorial.
+    public void FlipSoon()
+    {
+        if (enabled && CurrentPhase == Phase.Counting)
+        {
+            CurrentPhase = Phase.Warning;
+            elapsed = 0f;
+        }
+    }
+
     // Finishes any turn in progress so the player is never left frozen.
     public void Stop()
     {

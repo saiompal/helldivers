@@ -22,6 +22,9 @@ public static class MainMenuBuilder
 
     private const string MenuScenePath = "Assets/Scenes/MainMenu.unity";
 
+    private const float RowButtonWidth = 260f;
+    private const string TutorialPath = TutorialBuilder.ScenePath;
+
     // The menu shows one matching button for each level.
     private static readonly string[] LevelPaths =
     {
@@ -30,16 +33,6 @@ public static class MainMenuBuilder
         "Assets/Scenes/Level2.unity",
         "Assets/Scenes/Level3.unity",
         "Assets/Scenes/Level4.unity",
-    };
-
-    private static readonly string[] HowToPlay =
-    {
-        "Memorize the level before the lights go out",
-        "In the dark you only see a small circle around you",
-        "<b>F</b> lights the whole level for a moment, but charges are limited",
-        "The world <b>flips</b> every few seconds. Your light pulses red before it does",
-        "Gravity stays down, so a wall you can't climb may be one you can walk under",
-        "The <color=#5CE68A>exit</color> stays locked until you collect every <color=#FFD54A>star</color>",
     };
 
     private static readonly Color BackgroundColor = new Color(0.03f, 0.03f, 0.04f);
@@ -60,12 +53,13 @@ public static class MainMenuBuilder
         EditorApplication.delayCall += () =>
         {
             if (!EditorApplication.isPlayingOrWillChangePlaymode &&
-                File.Exists(MenuScenePath) && LevelPaths.All(File.Exists))
+                File.Exists(MenuScenePath) && File.Exists(TutorialPath) &&
+                LevelPaths.All(File.Exists))
                 SetBuildOrder();
         };
     }
 
-    [MenuItem("Tools/Build Alpha (Menu + Level 0)")]
+    [MenuItem("Tools/Build Alpha (Menu + Level 0 + Tutorial)")]
     private static void BuildAlpha()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -73,7 +67,7 @@ public static class MainMenuBuilder
             return;
         }
 
-        if (Level0Builder.Build())
+        if (Level0Builder.Build() && TutorialBuilder.Build())
         {
             BuildMenu();
             EditorSceneManager.OpenScene(MenuScenePath, OpenSceneMode.Single);
@@ -135,7 +129,12 @@ public static class MainMenuBuilder
 
         AddText(canvasObject.transform, "Tagline", Tagline, 32f, MutedColor);
 
-        BuildHowToPlay(canvasObject.transform);
+        // How To Play above the level row. The panel stays
+        // hidden until its button is pressed.
+        Button howToPlay = CreateButton(canvasObject.transform, "How To Play");
+        GameObject panel = BuildHowToPlay(canvasObject.transform);
+        panel.SetActive(false);
+        UnityEventTools.AddPersistentListener(howToPlay.onClick, menu.ToggleHowToPlay);
 
         GameObject levels = new GameObject("Levels", typeof(RectTransform));
         levels.transform.SetParent(canvasObject.transform, false);
@@ -146,14 +145,18 @@ public static class MainMenuBuilder
         levelRow.childControlHeight = true;
         levelRow.childForceExpandWidth = false;
         levelRow.childForceExpandHeight = false;
-        Button play = null;
+        Button tutorial = CreateButton(levels.transform, "Tutorial", RowButtonWidth);
+        tutorial.name = "Tutorial Button";
+        UnityEventTools.AddStringPersistentListener(
+            tutorial.onClick, menu.LoadLevel,
+            Path.GetFileNameWithoutExtension(TutorialPath));
+
         for (int i = 0; i < LevelPaths.Length; i++)
         {
-            Button level = CreateButton(levels.transform, $"Level {i}");
+            Button level = CreateButton(levels.transform, $"Level {i}", RowButtonWidth);
             UnityEventTools.AddStringPersistentListener(
                 level.onClick, menu.LoadLevel,
                 Path.GetFileNameWithoutExtension(LevelPaths[i]));
-            if (play == null) play = level;
         }
 
         Button quit = CreateButton(canvasObject.transform, "Quit");
@@ -168,7 +171,7 @@ public static class MainMenuBuilder
         label.characterSpacing = 8f;
 
         GameObject eventSystem = new GameObject("EventSystem");
-        eventSystem.AddComponent<EventSystem>().firstSelectedGameObject = play.gameObject;
+        eventSystem.AddComponent<EventSystem>();
         eventSystem.AddComponent<InputSystemUIInputModule>();
 
         EditorSceneManager.SaveScene(scene, MenuScenePath);
@@ -183,7 +186,7 @@ public static class MainMenuBuilder
         BuildMenu();
     }
 
-    private static void BuildHowToPlay(Transform parent)
+    private static GameObject BuildHowToPlay(Transform parent)
     {
         GameObject panel = new GameObject("How To Play", typeof(RectTransform));
         panel.transform.SetParent(parent, false);
@@ -198,22 +201,8 @@ public static class MainMenuBuilder
         column.padding = new RectOffset(48, 48, 28, 32);
         column.childAlignment = TextAnchor.UpperLeft;
 
-        TextMeshProUGUI header = AddText(panel.transform, "Header", "HOW TO PLAY", 18f, AccentColor);
-        header.fontStyle = FontStyles.Bold;
-        header.characterSpacing = 8f;
-        header.alignment = TextAlignmentOptions.Left;
-
-        foreach (string line in HowToPlay)
-        {
-            TextMeshProUGUI text = AddText(panel.transform, "Line", $"\u2022  {line}", 26f, TitleColor);
-            text.alignment = TextAlignmentOptions.Left;
-        }
-
-        TextMeshProUGUI controls = AddText(
-            panel.transform, "Controls",
-            "A / D  move   \u00B7   SPACE  jump   \u00B7   F  light   \u00B7   R  restart   \u00B7   ESC  menu",
-            20f, MutedColor);
-        controls.alignment = TextAlignmentOptions.Left;
+        // MainMenu fills in the instructions when the panel is opened.
+        return panel;
     }
 
     private static VerticalLayoutGroup AddColumn(GameObject go, float spacing)
@@ -244,7 +233,7 @@ public static class MainMenuBuilder
     }
 
     // A standard Unity UI button, styled like the HUD key caps.
-    private static Button CreateButton(Transform parent, string label)
+    private static Button CreateButton(Transform parent, string label, float width = 320f)
     {
         TMP_DefaultControls.Resources resources = new TMP_DefaultControls.Resources
         {
@@ -256,7 +245,7 @@ public static class MainMenuBuilder
         buttonObject.transform.SetParent(parent, false);
 
         LayoutElement size = buttonObject.AddComponent<LayoutElement>();
-        size.preferredWidth = 320f;
+        size.preferredWidth = width;
         size.preferredHeight = 70f;
 
         buttonObject.GetComponent<Image>().color = ButtonColor;
@@ -283,7 +272,7 @@ public static class MainMenuBuilder
     // blank or missing scene.
     private static void SetBuildOrder()
     {
-        string[] pinned = new[] { MenuScenePath }.Concat(LevelPaths).ToArray();
+        string[] pinned = new[] { MenuScenePath, TutorialPath }.Concat(LevelPaths).ToArray();
 
         List<EditorBuildSettingsScene> scenes = pinned
             .Select(path => new EditorBuildSettingsScene(path, true))

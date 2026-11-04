@@ -46,7 +46,7 @@ public class ExitTrigger : MonoBehaviour
         GameManager manager = GameManager.Instance;
         if (spriteRenderer != null && manager != null)
         {
-            spriteRenderer.enabled = manager.IsLevel3 || !manager.IsPreviewing;
+            spriteRenderer.enabled = manager.IsLevel3 || manager.IsTutorial || !manager.IsPreviewing;
         }
     }
 

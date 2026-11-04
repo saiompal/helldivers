@@ -11,6 +11,13 @@ public class StarCollectible : MonoBehaviour
 
         if (GameManager.Instance != null && GameManager.Instance.TryCollectStar())
         {
+            SpriteRenderer appearance = GetComponent<SpriteRenderer>();
+            if (appearance != null)
+            {
+                StarPickupEffect.Play(
+                    transform.position, appearance.sprite, appearance.sharedMaterial);
+            }
+
             Destroy(gameObject);
         }
     }
