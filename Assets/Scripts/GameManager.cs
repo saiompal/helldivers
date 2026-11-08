@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text chargesText;
     [Tooltip("Optional. Shows stars collected out of the total.")]
     [SerializeField] private TMP_Text starsText;
+    [SerializeField] private GameObject nextLevelButton;
 
     private enum Phase
     {
@@ -126,6 +127,12 @@ public class GameManager : MonoBehaviour
             );
             enabled = false;
             return;
+        }
+
+        // Hide Next Level button when the level starts
+        if (nextLevelButton != null)
+        {
+            nextLevelButton.SetActive(false);
         }
 
         chargesRemaining = revealCharges;
@@ -557,6 +564,11 @@ public class GameManager : MonoBehaviour
         }
 
         EndRun(Phase.Won);
+
+        if (nextLevelButton != null)
+        {
+            nextLevelButton.SetActive(HasNextLevel());
+        }
 
         float runSeconds = RunSeconds;
         GameAnalytics.Record("levelCompleted",

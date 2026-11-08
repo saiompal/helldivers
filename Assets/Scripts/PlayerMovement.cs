@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     private readonly ContactPoint2D[] contacts = new ContactPoint2D[24];
     private Rigidbody2D body;
     private float steer;
+    private MobileControls mobileControls;
     private float jumpRequestedUntil = float.NegativeInfinity;
     private float groundedUntil = float.NegativeInfinity;
     private float normalGravityScale;
@@ -54,26 +55,39 @@ public class PlayerMovement : MonoBehaviour
     {
         body = GetComponent<Rigidbody2D>();
         normalGravityScale = body.gravityScale;
+
+        mobileControls = GetComponent<MobileControls>();
     }
 
     protected virtual void Update()
     {
         Keyboard keyboard = Keyboard.current;
-        if (keyboard == null || !Active)
+        if (!Active)
         {
             ClearInput();
             return;
         }
 
-        steer = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f)
+        if (keyboard != null)
+        {
+            steer = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f)
               - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1f : 0f);
 
-        if (keyboard.spaceKey.wasPressedThisFrame ||
-            keyboard.wKey.wasPressedThisFrame ||
-            keyboard.upArrowKey.wasPressedThisFrame)
-        {
-            jumpRequestedUntil = Time.time + jumpBufferSeconds;
+            if (keyboard.spaceKey.wasPressedThisFrame ||
+                keyboard.wKey.wasPressedThisFrame ||
+                keyboard.upArrowKey.wasPressedThisFrame)
+            {
+                jumpRequestedUntil = Time.time + jumpBufferSeconds;
+            }
         }
+        // Mobile controls are only used on WebGL builds, so they don't interfere with desktop input.
+#if UNITY_WEBGL && !UNITY_EDITOR
+        if (mobileControls != null &&
+            Mathf.Abs(mobileControls.Horizontal) > 0.01f)
+        {
+            steer = mobileControls.Horizontal;
+        }
+#endif
     }
 
     protected virtual void FixedUpdate()
@@ -243,5 +257,14 @@ public class PlayerMovement : MonoBehaviour
         {
             ClearInput();
         }
+    }
+
+    // Called by MobileControls when the player taps the screen to jump.
+    public void RequestJump()
+    {
+        if (!Active)
+            return;
+
+        jumpRequestedUntil = Time.time + jumpBufferSeconds;
     }
 }
