@@ -2,7 +2,7 @@ name: Deploy game versions to Pages
 
 on:
   push:
-    branches: [main, beta-changes]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -32,8 +32,10 @@ jobs:
             mkdir -p "site/$v"
             git archive "refs/tags/$v" docs | tar -x -C "site/$v" --strip-components=1
           done
-          mkdir -p site/beta-changes
-          git archive "refs/heads/beta-changes" docs | tar -x -C site/beta-changes --strip-components=1
+          # Publish the beta with mobile controls build from main
+          mkdir -p site/betawmob
+          git archive HEAD docs |
+              tar -x -C site/betawmob --strip-components=1
           cat > site/index.html <<'HTML'
           <!doctype html>
           <meta charset="utf-8"><title>Helldivers</title>
@@ -41,7 +43,7 @@ jobs:
           <ul>
             <li><a href="alpha/">Alpha</a></li>
             <li><a href="beta/">Beta</a></li>
-            <li><a href="beta-changes/">Beta Changes</a></li>
+            <li><a href="betawmob/">Beta (Mobile Controls)</a></li>
           </ul>
           HTML
           touch site/.nojekyll
