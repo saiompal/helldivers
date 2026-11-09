@@ -1,16 +1,19 @@
 using UnityEngine;
 
-// Level 3 shows the goal during the map preview. It remains locked, dimmed
-// red, until every star is collected. Other levels keep their preview rule.
+// Every level shows the goal as a bright red landmark during memorization.
+// During play it remains locked and dim red until every star is collected.
 public class ExitTrigger : MonoBehaviour
 {
     [SerializeField] private Color lockedColor = new Color(0.45f, 0.12f, 0.1f);
     [SerializeField] private Color lockedGlowColor = new Color(1f, 0.3f, 0.25f);
+    [SerializeField] private Color previewColor = new Color(1f, 0.04f, 0.03f);
+    [SerializeField] private Color previewGlowColor = new Color(1f, 0.08f, 0.03f);
 
     private SpriteRenderer spriteRenderer;
     private PulsingGlow glow;
     private Color unlockedColor;
     private Color unlockedGlowColor;
+    private bool wasPreviewing;
 
     private void Awake()
     {
@@ -44,9 +47,24 @@ public class ExitTrigger : MonoBehaviour
     private void Update()
     {
         GameManager manager = GameManager.Instance;
-        if (spriteRenderer != null && manager != null)
+        if (manager == null)
+            return;
+
+        if (manager.IsPreviewing)
         {
-            spriteRenderer.enabled = manager.IsLevel3 || manager.IsTutorial || !manager.IsPreviewing;
+            wasPreviewing = true;
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = true;
+                spriteRenderer.color = previewColor;
+            }
+            if (glow != null)
+                glow.GlowColor = previewGlowColor;
+        }
+        else if (wasPreviewing)
+        {
+            wasPreviewing = false;
+            ShowLocked(!manager.IsExitUnlocked);
         }
     }
 

@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 // Runs a level: a short preview of the whole map with the lights on, then
 // the camera zooms in on the player and the lights go out, leaving only a
@@ -22,8 +21,8 @@ public class GameManager : MonoBehaviour
     public bool IsFinished => phase == Phase.Won || phase == Phase.Failed;
     public int StarsCollected => starsCollected;
     public int RevealsUsed => revealsUsed;
+    public int ChargesRemaining => chargesRemaining;
     public bool IsTutorial => gameObject.scene.name == "Tutorial";
-    public bool IsLevel3 => gameObject.scene.name == "Level3";
 
     // Fires once, when the last star is collected.
     public event Action ExitUnlocked;
@@ -34,7 +33,6 @@ public class GameManager : MonoBehaviour
     [Header("Level Rules")]
     [SerializeField, Min(0f)] private float previewSeconds = 5f;
     [SerializeField, Min(0.1f)] private float revealSeconds = 2f;
-    [SerializeField, Min(0)] private int revealCharges = 3;
     [Tooltip("Global light level while dark. The player's own light still shows a circle.")]
     [SerializeField, Range(0f, 1f)] private float darkIntensity = 0f;
     [Tooltip("Each collected star adds this share of the light's original radius.")]
@@ -87,6 +85,7 @@ public class GameManager : MonoBehaviour
     private Light2D playerVisionLight;
     private float initialVisionInnerRadius;
     private float initialVisionOuterRadius;
+    private RunTrajectory trajectory;
 
     private bool IsActive =>
         phase == Phase.Playing ||
@@ -135,8 +134,14 @@ public class GameManager : MonoBehaviour
             nextLevelButton.SetActive(false);
         }
 
-        chargesRemaining = revealCharges;
-        AddMazeLegend();
+        GameplayHudRuntime.Ensure(
+            statusText, mapFlip, ref chargesText, ref starsText);
+        if (cameraFollow != null)
+            cameraFollow.SetHudShares(0.12f, 0f);
+        trajectory = gameObject.AddComponent<RunTrajectory>();
+        trajectory.Configure(mapFlip != null ? mapFlip.PlayerTransform : null,
+            mapFlip != null ? mapFlip.MapRoot : null, mapFlip, cameraFollow);
+        chargesRemaining = IsTutorial ? Mathf.Max(1, PlayerProgress.StartingLightCharges) : PlayerProgress.StartingLightCharges;
         UpdateChargesText();
         UpdateStarsText();
 
@@ -146,56 +151,6 @@ public class GameManager : MonoBehaviour
             ("attempt", attempt));
 
         StartCoroutine(BeginLevel());
-    }
-
-    private void AddMazeLegend()
-    {
-        PortalController portal = FindAnyObjectByType<PortalController>();
-        if (portal != null)
-            AddLegendEntry("Portal", portal.GetComponentInChildren<SpriteRenderer>());
-
-        Hazard spike = FindAnyObjectByType<Hazard>();
-        if (spike != null)
-            AddLegendEntry("Spike", spike.GetComponentInChildren<SpriteRenderer>());
-    }
-
-    private void AddLegendEntry(string entryName, SpriteRenderer appearance)
-    {
-        if (appearance == null || statusText.canvas == null)
-            return;
-
-        Transform items = statusText.canvas.rootCanvas.transform.Find("HUD Bottom Bar/LEGEND/Items");
-        if (items == null || items.Find(entryName) != null)
-            return;
-
-        // Older HUD builds used this name for the spike legend entry.
-        if (entryName == "Spike" && items.Find("Spike trap") != null)
-            return;
-
-        Transform template = items.Find("Exit");
-        if (template == null)
-            return;
-
-        // Reuse existing styling when maze objects were added after the HUD was built.
-        GameObject entry = Instantiate(template.gameObject, items, false);
-        entry.name = entryName;
-        TMP_Text label = entry.GetComponentInChildren<TMP_Text>();
-        if (label != null)
-            label.text = entryName;
-
-        Transform shape = entry.transform.Find("Icon/Shape");
-        Image icon = shape != null ? shape.GetComponent<Image>() : null;
-        if (icon != null)
-        {
-            icon.sprite = appearance.sprite;
-            icon.color = appearance.color;
-            icon.preserveAspect = true;
-            icon.rectTransform.sizeDelta = new Vector2(28f, 28f);
-        }
-
-        GridLayoutGroup grid = items.GetComponent<GridLayoutGroup>();
-        if (grid != null)
-            grid.constraintCount = items.childCount <= 4 ? 2 : 3;
     }
 
     private void Update()
@@ -290,6 +245,7 @@ public class GameManager : MonoBehaviour
         globalLight.intensity = darkIntensity;
         phase = Phase.Playing;
         runStartTime = Time.time;
+        trajectory.BeginRecording();
 
         if (cameraFollow != null)
         {
@@ -364,12 +320,13 @@ public class GameManager : MonoBehaviour
         }
 
         starsCollected++;
+        trajectory?.MarkWaypoint();
         UpdatePlayerVisionRadius();
         UpdateStarsText();
 
-        // Every star in every level earns one stored F reveal. Earned charges
-        // may exceed the three starting charges.
-        chargesRemaining++;
+        // Every star earns one live F reveal for this run. Star rewards are
+        // intentionally uncapped and may exceed the five-pip HUD rail.
+        chargesRemaining = LightChargeRules.AddStarReward(chargesRemaining);
         UpdateChargesText();
         ShowChargeGained();
 
@@ -464,30 +421,11 @@ public class GameManager : MonoBehaviour
     {
         string state = phase == Phase.Revealing
             ? $"<color={LanternColor}>Light on</color>"
-            : IsExitUnlocked ? "Reach the exit" : "Find the stars in the dark";
-
-        if (mapFlip != null)
-        {
-            switch (mapFlip.CurrentPhase)
-            {
-                case MapFlipController.Phase.Warning:
-                    state = $"<color={DangerColor}><b>MAP FLIPPING   " +
-                            $"{Mathf.CeilToInt(mapFlip.SecondsUntilFlip)}</b></color>";
-                    break;
-
-                case MapFlipController.Phase.Turning:
-                    state = $"<color={DangerColor}><b>FLIP!</b></color>";
-                    break;
-
-                case MapFlipController.Phase.Counting:
-                    state += $"   \u00B7   Flip in <b>{Mathf.CeilToInt(mapFlip.SecondsUntilFlip)}</b>";
-                    break;
-            }
-        }
+            : string.Empty;
 
         if (Time.time < toastUntil)
         {
-            state = $"{toast}   \u00B7   {state}";
+            state = string.IsNullOrEmpty(state) ? toast : $"{toast}   \u00B7   {state}";
         }
 
         statusText.text = state;
@@ -500,10 +438,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // A compact count remains readable when star rewards take the total
-        // above the three starting charges.
-        chargesText.text =
-            $"<color={LanternColor}>\u25CF \u00D7 {chargesRemaining}</color>";
+        GameplayHudRuntime.UpdateCharges(chargesText, chargesRemaining);
     }
 
     private void UpdateStarsText()
@@ -569,6 +504,10 @@ public class GameManager : MonoBehaviour
         {
             nextLevelButton.SetActive(HasNextLevel());
         }
+        LevelCompletionResult completion = default;
+        int levelIndex = -1;
+        if (LevelCatalog.TryGetLevelIndex(levelName, out levelIndex))
+            completion = PlayerProgress.CompleteLevel(levelIndex);
 
         float runSeconds = RunSeconds;
         GameAnalytics.Record("levelCompleted",
@@ -582,11 +521,23 @@ public class GameManager : MonoBehaviour
         GameAnalytics.Flush();
 
         string next = HasNextLevel()
-            ? "N  next level   \u00B7   R  replay"
+            ? "N  Next level   \u00B7   R  Replay   \u00B7   Esc  Menu"
             : "R  replay   \u00B7   Esc  menu";
-        statusText.text =
+        string reward = string.Empty;
+        if (completion.UnlockedStartingCharge)
+        {
+            reward = $"   \u00B7   <color={LanternColor}><b>STARTING LIGHT UNLOCKED  " +
+                $"{completion.StartingLightCharges}</b></color>";
+        }
+        if (completion.UnlockedNextLevel)
+        {
+            reward += $"   \u00B7   <color={SuccessColor}>Level " +
+                $"{LevelCatalog.GetDisplayNumber(levelIndex + 1)} unlocked</color>";
+        }
+        GameplayHudRuntime.ShowCompletion(statusText,
             $"<color={SuccessColor}>Escaped in {runSeconds:0.0}s</color>   " +
-            $"<color={LanternColor}>Stars {starsCollected} / {starsTotal}</color>   {next}";
+            $"<color={LanternColor}>Stars {starsCollected} / {starsTotal}</color>" +
+            reward, next);
     }
 
     public void FailLevel(string reason)
@@ -632,8 +583,10 @@ public class GameManager : MonoBehaviour
         // Pull back to show the whole route.
         if (cameraFollow != null)
         {
-            cameraFollow.ShowOverview();
+            cameraFollow.ShowOverview(outcome == Phase.Won ? .16f : 0f);
         }
+        if (outcome == Phase.Won) trajectory?.ShowCompletedRoute();
+        else trajectory?.Clear();
     }
 
     public void RestartLevel()
@@ -660,15 +613,18 @@ public class GameManager : MonoBehaviour
 
     private static bool HasNextLevel()
     {
-        return SceneManager.GetActiveScene().buildIndex + 1 <
-               SceneManager.sceneCountInBuildSettings;
+        return LevelCatalog.TryGetLevelIndex(
+            SceneManager.GetActiveScene().name, out int levelIndex) &&
+            levelIndex + 1 < LevelCatalog.Count;
     }
 
     private void LoadNextLevel()
     {
         if (HasNextLevel())
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            LevelCatalog.TryGetLevelIndex(
+                SceneManager.GetActiveScene().name, out int levelIndex);
+            SceneManager.LoadScene(LevelCatalog.GetSceneName(levelIndex + 1));
         }
     }
 

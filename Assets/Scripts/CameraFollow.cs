@@ -1,9 +1,7 @@
 using UnityEngine;
 
-// Shows the whole map during the preview, then zooms in and follows the
-// player so only the area around them is on screen. The camera never
-// shows past the edge of the map, and keeps the player centred in the
-// space between the HUD bars.
+// Shows the whole map during memorization, then follows the player in the dark.
+// The visible play area accounts for the HUD above it.
 [RequireComponent(typeof(Camera))]
 public class CameraFollow : MonoBehaviour
 {
@@ -38,6 +36,8 @@ public class CameraFollow : MonoBehaviour
     private float targetFollowSize;
     private Vector2 focus;
     private Vector2 focusVelocity;
+    private bool fitCompletion;
+    public bool IsOverviewSettled => targetBlend == 0f && blend <= .001f;
 
     private void Awake()
     {
@@ -60,8 +60,13 @@ public class CameraFollow : MonoBehaviour
         targetBlend = 1f;
     }
 
-    public void ShowOverview()
+    public void ShowOverview(float footerShare = 0f)
     {
+        if (footerShare > 0)
+        {
+            bottomBarShare = Mathf.Clamp(footerShare, 0, .5f);
+            fitCompletion = true;
+        }
         targetBlend = 0f;
     }
 
@@ -70,8 +75,22 @@ public class CameraFollow : MonoBehaviour
         targetFollowSize = revealing ? revealSize : followSize;
     }
 
+    public void SetHudShares(float topShare, float bottomShare)
+    {
+        topBarShare = Mathf.Clamp(topShare, 0f, 0.5f);
+        bottomBarShare = Mathf.Clamp(bottomShare, 0f, 0.5f);
+    }
+
     private void LateUpdate()
     {
+        if (fitCompletion && mapBounds != null)
+        {
+            Bounds bounds = mapBounds.bounds;
+            overviewSize = Mathf.Max((bounds.extents.y + .35f) / (1f - topBarShare - bottomBarShare),
+                (bounds.extents.x + .35f) / Mathf.Max(.1f, view.aspect));
+            overviewPosition = new Vector3(bounds.center.x,
+                bounds.center.y + overviewSize * (topBarShare - bottomBarShare), transform.position.z);
+        }
         if (target == null)
         {
             return;

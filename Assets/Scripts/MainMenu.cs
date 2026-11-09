@@ -1,356 +1,173 @@
-using System.Collections.Generic;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    private const int LevelCount = 5;
+    public const string LayoutName = "Reference Menu v5";
+    private Transform layout, home, map, help;
+    private Coroutine helpAnimation;
 
-    [Tooltip("Hidden in web builds, where the browser tab can't be closed.")]
-    [SerializeField] private GameObject quitButton;
-
-    private const string TutorialScene = "Tutorial";
-    private const string TutorialButtonName = "Tutorial Button";
-    private const float RowButtonWidth = 260f;
-
-    private GameObject howToPlayPanel;
-    private readonly List<GameObject> hiddenByHelp = new List<GameObject>();
-    private int helpButtonIndex;
-
-    private void Start()
+    private void Awake()
     {
-        EnsureLevelButtons();
-        EnsureTutorialAndHelp();
-        ClearPreselection();
+        layout = transform.Find(LayoutName);
+        if (layout == null) RebuildUi();
+        Bind();
+    }
+    private void Start() => ShowHome();
 
-        if (quitButton != null && Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-            quitButton.SetActive(false);
-        }
+    // One source for editor-baked scenes and runtime repair of legacy scenes.
+    public void RebuildUi()
+    {
+        GameUi.ConfigureCanvas(GetComponent<Canvas>());
+        GameUi.Clear(transform);
+        var bg = GameUi.Shape("Background", transform, UiShapeGraphic.Shape.Backdrop, Vector2.zero, new Vector2(1920, 1080), Color.black, Color.clear);
+        GameUi.Stretch(bg.rectTransform);
+        layout = GameUi.Rect(LayoutName, transform, Vector2.zero, new Vector2(1680, 1000));
+        home = GameUi.Rect("Home", layout, Vector2.zero, new Vector2(1680, 1000));
+        BuildHome(home);
+        help = home.Find("How To Play");
+        help.gameObject.SetActive(false);
+        map = GameUi.Rect("Level Map", layout, Vector2.zero, new Vector2(1440, 1000));
+        BuildMap(map);
+        map.gameObject.SetActive(false);
     }
 
-    // Keeps older checked-in menu scenes usable immediately while the editor
-    // builder creates the same level-button layout for future rebuilds.
-    private void EnsureLevelButtons()
+    private static void BuildHome(Transform root)
     {
-        Transform levels = transform.Find("Levels");
-        if (levels == null)
+        var frame = GameUi.Shape("Title Frame", root, UiShapeGraphic.Shape.Title, new Vector2(0, 245), new Vector2(1390, 175), Color.clear, GameUi.White, 3, 24);
+        var title = GameUi.Text("Title", frame.transform, "IN THE DARK", 79, Vector2.zero, new Vector2(1300, 150));
+        title.characterSpacing = 13;
+        GameUi.Shape("Title Diamond", frame.transform, UiShapeGraphic.Shape.Spark, new Vector2(0, -87.5f), new Vector2(36, 36), GameUi.White, GameUi.White, 0);
+        GameUi.Button("Start", root, "Start", new Vector2(0, -50), new Vector2(610, 122), true);
+        GameUi.Button("Help Button", root, "How to Play", new Vector2(0, -205), new Vector2(610, 122));
+        var help = GameUi.Shape("How To Play", root, UiShapeGraphic.Shape.Rounded, new Vector2(0, -110), new Vector2(615, 460), GameUi.Dark, GameUi.White, 2.4f, 28);
+        help.raycastTarget = true;
+        help.gameObject.AddComponent<CanvasGroup>();
+        var close = GameUi.Button("Close", help.transform, "X", new Vector2(265, 191), new Vector2(42, 40), false, false);
+        close.transform.Find("Label").GetComponent<TMP_Text>().fontSize = 20;
+        GameUi.Text("Heading", help.transform, "How to Play", 37, new Vector2(0, 170), new Vector2(540, 60));
+        GameUi.Divider(help.transform, 125, 550);
+        Key(help.transform, "A", new Vector2(-220, 48), 62);
+        GameUi.Text("Plus", help.transform, "+", 25, new Vector2(-171, 48), new Vector2(30, 45));
+        Key(help.transform, "D", new Vector2(-121, 48), 62);
+        HelpText(help.transform, "Move Left / Right", 48);
+        Key(help.transform, "Space", new Vector2(-170, -33), 164); HelpText(help.transform, "Jump", -33);
+        Key(help.transform, "F", new Vector2(-170, -114), 62); HelpText(help.transform, "Use Light", -114);
+        Key(help.transform, "R", new Vector2(-170, -195), 62); HelpText(help.transform, "Restart", -195);
+        var quit = GameUi.Button("Quit", root, "Quit", new Vector2(0, -390), new Vector2(220, 64), false, false);
+        quit.transform.Find("Label").GetComponent<TMP_Text>().fontSize = 26;
+    }
+    private static void Key(Transform root, string text, Vector2 position, float width)
+    {
+        var key = GameUi.Shape(text + " Key", root, UiShapeGraphic.Shape.Rounded, position, new Vector2(width, 54), Color.clear, GameUi.White, 2.4f, 8);
+        GameUi.Text("Label", key.transform, text, 29, Vector2.zero, new Vector2(width, 54));
+    }
+    private static void HelpText(Transform root, string text, float y)
+    {
+        var label = GameUi.Text(text, root, text, 25, new Vector2(120, y), new Vector2(265, 54));
+        label.alignment = TextAlignmentOptions.MidlineLeft;
+    }
+    private static void BuildMap(Transform root)
+    {
+        var header = GameUi.Shape("Header", root, UiShapeGraphic.Shape.Bevel, new Vector2(0, 430), new Vector2(730, 93), Color.clear, GameUi.White, 2.6f, 34);
+        GameUi.Text("Title", header.transform, "Select Level", 50, Vector2.zero, new Vector2(600, 90));
+        foreach (float x in new[] { -296f, 296f }) GameUi.Shape("Diamond", header.transform, UiShapeGraphic.Shape.Spark, new Vector2(x, 0), new Vector2(25, 25), GameUi.White, GameUi.White, 0);
+        var route = GameUi.Rect("Route", root, Vector2.zero, new Vector2(1440, 1000));
+        var path = route.gameObject.AddComponent<LevelPathGraphic>(); path.color = GameUi.White; path.raycastTarget = false;
+        Endpoint(root, "Start Route", LevelPathGraphic.StartAnchor, UiShapeGraphic.Shape.Play);
+        Endpoint(root, "Finish Route", LevelPathGraphic.FinishAnchor, UiShapeGraphic.Shape.Flag);
+        for (int i = 0; i < LevelCatalog.Count; i++)
         {
-            Debug.LogError("MainMenu needs a Levels container.", this);
-            return;
+            var node = GameUi.Button("Level " + i, root, "", Vector2.zero, new Vector2(166, 166), false, false);
+            var rect = (RectTransform)node.transform;
+            rect.anchorMin = rect.anchorMax = LevelPathGraphic.NodeAnchors[i];
+            (node.targetGraphic as UiShapeGraphic).Configure(UiShapeGraphic.Shape.Circle, GameUi.Dark, GameUi.White, 4);
+            GameUi.Text("Number", node.transform, (i + 1).ToString(), 62, new Vector2(0, 22), new Vector2(120, 80));
+            GameUi.Shape("Completion Star", node.transform, UiShapeGraphic.Shape.Star,
+                new Vector2(0, -39), new Vector2(35, 35), Color.clear, GameUi.White, 2);
         }
-
-        List<Button> buttons = new List<Button>();
-        for (int i = 0; i < levels.childCount; i++)
+        var back = GameUi.Button("Back", root, "Back", new Vector2(-558, -460), new Vector2(250, 70), false, false);
+        back.transform.Find("Label").GetComponent<RectTransform>().anchoredPosition = new Vector2(22, 0);
+        back.transform.Find("Label").GetComponent<TMP_Text>().fontSize = 32;
+        GameUi.Shape("Arrow", back.transform, UiShapeGraphic.Shape.Arrow, new Vector2(-78, 0), new Vector2(38, 38), Color.clear, GameUi.White, 3);
+    }
+    private static void Endpoint(Transform root, string name, Vector2 anchor, UiShapeGraphic.Shape symbol)
+    {
+        var p = GameUi.Shape(name, root, UiShapeGraphic.Shape.Rounded, Vector2.zero, new Vector2(104, 94), GameUi.Dark, GameUi.White, 4, 22);
+        p.rectTransform.anchorMin = p.rectTransform.anchorMax = anchor;
+        GameUi.Shape("Icon", p.transform, symbol, Vector2.zero, new Vector2(55, 55), Color.clear, GameUi.White, 3);
+    }
+    private void Bind()
+    {
+        layout = transform.Find(LayoutName); home = layout.Find("Home"); map = layout.Find("Level Map");
+        help = home.Find("How To Play");
+        home.Find("Start").GetComponent<Button>().onClick.AddListener(ShowLevelMap);
+        home.Find("Help Button").GetComponent<Button>().onClick.AddListener(ShowHelp);
+        help.Find("Close").GetComponent<Button>().onClick.AddListener(HideHelp);
+        home.Find("Quit").GetComponent<Button>().onClick.AddListener(Quit);
+        home.Find("Quit").gameObject.SetActive(Application.platform != RuntimePlatform.WebGLPlayer);
+        map.Find("Back").GetComponent<Button>().onClick.AddListener(ShowHome);
+        for (int i = 0; i < LevelCatalog.Count; i++) { int index = i; map.Find("Level " + i).GetComponent<Button>().onClick.AddListener(() => LoadLevel(index)); }
+    }
+    public void ShowHome() { home.gameObject.SetActive(true); map.gameObject.SetActive(false); HideHelp(); ClearSelection(); }
+    public void ShowLevelMap() { HideHelp(); RefreshLevelMap(); home.gameObject.SetActive(false); map.gameObject.SetActive(true); ClearSelection(); }
+    public void ShowHelp()
+    {
+        help.gameObject.SetActive(true);
+        if (helpAnimation != null) StopCoroutine(helpAnimation);
+        if (Application.isPlaying) helpAnimation = StartCoroutine(OpenHelp());
+        else { help.GetComponent<CanvasGroup>().alpha = 1f; help.localScale = Vector3.one; }
+        ClearSelection();
+    }
+    public void HideHelp()
+    {
+        if (helpAnimation != null) { StopCoroutine(helpAnimation); helpAnimation = null; }
+        if (help != null) help.gameObject.SetActive(false);
+    }
+    private IEnumerator OpenHelp()
+    {
+        var group = help.GetComponent<CanvasGroup>();
+        for (float t = 0; t < .18f; t += Time.unscaledDeltaTime)
         {
-            Button button = levels.GetChild(i).GetComponent<Button>();
-            if (button != null && button.name != TutorialButtonName)
-            {
-                buttons.Add(button);
-            }
+            float progress = Mathf.SmoothStep(0, 1, t / .18f);
+            group.alpha = progress;
+            help.localScale = Vector3.one * Mathf.Lerp(.94f, 1f, progress);
+            yield return null;
         }
-
-        if (buttons.Count == 0)
+        group.alpha = 1; help.localScale = Vector3.one; helpAnimation = null;
+    }
+    public void LoadTutorial() => SceneManager.LoadScene("Tutorial");
+    public void LoadLevel(int index) { if (index >= 0 && index < LevelCatalog.Count && PlayerProgress.IsLevelUnlocked(index)) SceneManager.LoadScene(LevelCatalog.GetSceneName(index)); }
+    private void RefreshLevelMap()
+    {
+        for (int i = 0; i < LevelCatalog.Count; i++)
         {
-            Debug.LogError("MainMenu needs at least one level button template.", this);
-            return;
-        }
-
-        while (buttons.Count < LevelCount)
-        {
-            Button clone = Instantiate(buttons[0], levels);
-            buttons.Add(clone);
-        }
-
-        for (int i = 0; i < buttons.Count; i++)
-        {
-            bool active = i < LevelCount;
-            buttons[i].gameObject.SetActive(active);
-            if (!active)
-            {
-                continue;
-            }
-
-            string levelName = $"Level{i}";
-            buttons[i].gameObject.name = $"Level {i} Button";
-            TMP_Text label = buttons[i].GetComponentInChildren<TMP_Text>();
-            if (label != null)
-            {
-                label.text = $"Level {i}";
-            }
-
-            // Replace the event object so cloned buttons do not retain the
-            // template's serialized scene target.
-            buttons[i].onClick = new Button.ButtonClickedEvent();
-            buttons[i].onClick.AddListener(() => LoadLevel(levelName));
+            var node = map.Find("Level " + i); bool unlocked = PlayerProgress.IsLevelUnlocked(i);
+            node.GetComponent<Button>().interactable = unlocked;
+            Color tint = unlocked ? GameUi.White : new Color(.68f, .69f, .71f);
+            node.GetComponent<UiShapeGraphic>().Configure(UiShapeGraphic.Shape.Circle, GameUi.Dark, tint, 4);
+            node.Find("Number").GetComponent<TMP_Text>().color = tint;
+            bool completed = PlayerProgress.IsLevelCompleted(i);
+            node.Find("Completion Star").GetComponent<UiShapeGraphic>().Configure(UiShapeGraphic.Shape.Star,
+                completed ? GameUi.Gold : Color.clear, completed ? GameUi.Gold : tint, 2);
         }
     }
-
-    // Older checked-in menu scenes only have the level row and a permanent
-    // how-to-play panel. Hide the panel behind a button and add the tutorial
-    // button, cloning the Quit button for the style. A rebuilt menu already
-    // has both and is left alone.
-    private void EnsureTutorialAndHelp()
-    {
-        Transform panel = transform.Find("How To Play");
-        howToPlayPanel = panel != null ? panel.gameObject : null;
-        if (howToPlayPanel != null)
-        {
-            howToPlayPanel.SetActive(false);
-        }
-
-        if (quitButton == null)
-        {
-            return;
-        }
-
-        if (transform.Find("How To Play Button") == null)
-        {
-            Button help = CloneQuitButton("How To Play Button", "How To Play", 0);
-            help.onClick.AddListener(ToggleHowToPlay);
-        }
-
-        // The Tutorial button leads the level row. Six buttons at the default
-        // width would be wider than the screen, so the row buttons are narrower.
-        Transform levels = transform.Find("Levels");
-        if (levels == null)
-        {
-            return;
-        }
-
-        Transform tutorialButton = transform.Find(TutorialButtonName);
-        if (tutorialButton == null)
-        {
-            tutorialButton = levels.Find(TutorialButtonName);
-        }
-
-        if (tutorialButton == null)
-        {
-            Button tutorial = CloneQuitButton(TutorialButtonName, "Tutorial", 0);
-            tutorial.onClick.AddListener(() => LoadLevel(TutorialScene));
-            tutorialButton = tutorial.transform;
-        }
-
-        tutorialButton.SetParent(levels, false);
-        tutorialButton.SetAsFirstSibling();
-
-        foreach (Transform child in levels)
-        {
-            LayoutElement size = child.GetComponent<LayoutElement>();
-            if (size != null)
-            {
-                size.preferredWidth = RowButtonWidth;
-            }
-        }
-
-        // How To Play stays on its own just above the row.
-        Transform helpButton = transform.Find("How To Play Button");
-        helpButton.SetSiblingIndex(Mathf.Max(0, levels.GetSiblingIndex() - 1));
-    }
-
-    private Button CloneQuitButton(string objectName, string text, int siblingIndex)
-    {
-        GameObject clone = Instantiate(quitButton, transform);
-        clone.name = objectName;
-        clone.SetActive(true);
-        clone.transform.SetSiblingIndex(siblingIndex);
-
-        Button button = clone.GetComponent<Button>();
-        button.onClick = new Button.ButtonClickedEvent();
-        TMP_Text label = clone.GetComponentInChildren<TMP_Text>();
-        if (label != null)
-        {
-            label.text = text;
-        }
-        return button;
-    }
-
-    // No button starts highlighted. The event system selects its first
-    // button when it activates, which happens after Start, so clear both.
-    private static void ClearPreselection()
-    {
-        EventSystem system = EventSystem.current;
-        if (system != null)
-        {
-            system.firstSelectedGameObject = null;
-            system.SetSelectedGameObject(null);
-        }
-    }
-
-    // Opening How To Play clears the menu and shows only the instructions
-    // with a Back button; closing restores everything as it was.
-    public void ToggleHowToPlay()
-    {
-        if (howToPlayPanel == null)
-        {
-            Transform panel = transform.Find("How To Play");
-            howToPlayPanel = panel != null ? panel.gameObject : null;
-        }
-
-        Transform helpButton = transform.Find("How To Play Button");
-        if (howToPlayPanel == null || helpButton == null)
-        {
-            return;
-        }
-
-        bool open = !howToPlayPanel.activeSelf;
-        TMP_Text label = helpButton.GetComponentInChildren<TMP_Text>();
-
-        if (open)
-        {
-            hiddenByHelp.Clear();
-            helpButtonIndex = helpButton.GetSiblingIndex();
-            foreach (Transform child in transform)
-            {
-                if (child != helpButton && child.gameObject != howToPlayPanel &&
-                    child.gameObject.activeSelf)
-                {
-                    hiddenByHelp.Add(child.gameObject);
-                    child.gameObject.SetActive(false);
-                }
-            }
-
-            helpButton.SetAsLastSibling();
-        }
-        else
-        {
-            foreach (GameObject hidden in hiddenByHelp)
-            {
-                hidden.SetActive(true);
-            }
-
-            hiddenByHelp.Clear();
-            helpButton.SetSiblingIndex(helpButtonIndex);
-        }
-
-        if (open)
-        {
-            BuildHowToPlayContent(howToPlayPanel.transform);
-        }
-
-        howToPlayPanel.SetActive(open);
-        if (label != null)
-        {
-            label.text = open ? "Back" : "How To Play";
-        }
-    }
-
-    private static readonly (string Heading, string Body, string Color)[] Rules =
-    {
-        ("MEMORIZE", "Study the map before the lights go out.", "#FFD54A"),
-        ("LIGHT", "In the dark you only see a small circle. Press <b>F</b> to light the whole map. Charges are limited.", "#FFD54A"),
-        ("FLIP", "Every few seconds the map flips upside down. Your light pulses red just before.", "#FF5A4F"),
-        ("GRAVITY", "Gravity always pulls down, so a wall you can't climb may be one you can walk under.", "#FF5A4F"),
-        ("STARS", "Collect every star to unlock the exit. Each star also gives you +1 light charge.", "#FFD54A"),
-        ("EXIT", "Reach the exit to escape.", "#5CE68A"),
-    };
-
-    private const string ControlsLine =
-        "<b>A / D</b> move        <b>SPACE</b> jump        <b>F</b> light        <b>R</b> restart        <b>ESC</b> menu";
-
-    // Rebuilt every time the panel opens, so it looks the same in old and
-    // new menu scenes: a big title, one row per rule and a controls line.
-    private static void BuildHowToPlayContent(Transform panel)
-    {
-        for (int i = panel.childCount - 1; i >= 0; i--)
-        {
-            Destroy(panel.GetChild(i).gameObject);
-        }
-
-        VerticalLayoutGroup column = panel.GetComponent<VerticalLayoutGroup>();
-        if (column == null)
-        {
-            column = panel.gameObject.AddComponent<VerticalLayoutGroup>();
-        }
-
-        column.spacing = 26f;
-        column.padding = new RectOffset(70, 70, 50, 50);
-        column.childAlignment = TextAnchor.UpperLeft;
-        column.childControlWidth = true;
-        column.childControlHeight = true;
-        column.childForceExpandWidth = false;
-        column.childForceExpandHeight = false;
-
-        TMP_Text title = AddText(panel, "Header", "HOW TO PLAY", 72f,
-            new Color(1f, 0.84f, 0.29f), 1200f);
-        title.fontStyle = FontStyles.Bold;
-        title.characterSpacing = 10f;
-        title.margin = new Vector4(0f, 0f, 0f, 14f);
-
-        foreach (var rule in Rules)
-        {
-            GameObject row = new GameObject("Rule", typeof(RectTransform));
-            row.transform.SetParent(panel, false);
-            HorizontalLayoutGroup line = row.AddComponent<HorizontalLayoutGroup>();
-            line.spacing = 40f;
-            line.childAlignment = TextAnchor.UpperLeft;
-            line.childControlWidth = true;
-            line.childControlHeight = true;
-            line.childForceExpandWidth = false;
-            line.childForceExpandHeight = false;
-
-            TMP_Text heading = AddText(row.transform, "Heading", rule.Heading, 40f, Color.white, 230f);
-            heading.text = $"<color={rule.Color}>{rule.Heading}</color>";
-            heading.fontStyle = FontStyles.Bold;
-            heading.characterSpacing = 4f;
-
-            AddText(row.transform, "Body", rule.Body, 38f, new Color(0.93f, 0.94f, 0.96f), 1120f);
-        }
-
-        // A real spacer: text margins don't reliably count towards layout height.
-        GameObject spacer = new GameObject("Spacer", typeof(RectTransform));
-        spacer.transform.SetParent(panel, false);
-        spacer.AddComponent<LayoutElement>().preferredHeight = 30f;
-
-        TMP_Text controls = AddText(panel, "Controls", ControlsLine, 36f,
-            new Color(1f, 1f, 1f, 0.75f), 1390f);
-        controls.alignment = TextAlignmentOptions.Center;
-        controls.margin = new Vector4(0f, 40f, 0f, 0f);
-    }
-
-    private static TMP_Text AddText(Transform parent, string objectName, string text,
-        float size, Color color, float width)
-    {
-        GameObject go = new GameObject(objectName, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-
-        TextMeshProUGUI tmp = go.AddComponent<TextMeshProUGUI>();
-        tmp.text = text;
-        tmp.fontSize = size;
-        tmp.color = color;
-        tmp.alignment = TextAlignmentOptions.TopLeft;
-        tmp.textWrappingMode = TextWrappingModes.Normal;
-        tmp.raycastTarget = false;
-
-        LayoutElement element = go.AddComponent<LayoutElement>();
-        element.preferredWidth = width;
-        element.minWidth = width;
-        return tmp;
-    }
-
     private void Update()
     {
-        if (howToPlayPanel != null && howToPlayPanel.activeSelf &&
-            UnityEngine.InputSystem.Keyboard.current != null &&
-            UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            ToggleHowToPlay();
-        }
+        if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
+        if (help != null && help.gameObject.activeSelf) HideHelp();
+        else if (map != null && map.gameObject.activeSelf) ShowHome();
     }
-
-    // Each level button passes its scene name.
-    public void LoadLevel(string sceneName)
-    {
-        SceneManager.LoadScene(sceneName);
-    }
-
+    private static void ClearSelection() { if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null); }
     public void Quit()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+        UnityEditor.EditorApplication.isPlaying=false;
 #else
         Application.Quit();
 #endif

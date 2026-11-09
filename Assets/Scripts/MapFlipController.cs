@@ -37,6 +37,20 @@ public class MapFlipController : MonoBehaviour
     public bool IsTurning => CurrentPhase == Phase.Turning;
     public bool IsFlipped { get; private set; }
     public int FlipCount { get; private set; }
+    public Transform MapRoot => mapRoot;
+    public Transform PlayerTransform => player != null ? player.transform : null;
+
+    public float CycleDuration => secondsBetweenFlips + warningSeconds;
+    public float CycleProgress01 => CurrentPhase switch
+    {
+        Phase.Counting => Mathf.Clamp01(elapsed / CycleDuration),
+        Phase.Warning => Mathf.Clamp01((secondsBetweenFlips + elapsed) / CycleDuration),
+        Phase.Turning => 1f,
+        _ => 0f
+    };
+    public float TurnProgress01 => CurrentPhase == Phase.Turning
+        ? visualTurnProgress
+        : 0f;
 
     // Seconds until the turn starts, counting through the warning.
     public float SecondsUntilFlip => CurrentPhase switch
@@ -54,6 +68,7 @@ public class MapFlipController : MonoBehaviour
     private RigidbodyInterpolation2D normalInterpolation;
     private Color visionColor;
     private float elapsed;
+    private float visualTurnProgress;
 
     private void Awake()
     {
@@ -82,6 +97,7 @@ public class MapFlipController : MonoBehaviour
         }
 
         elapsed = 0f;
+        visualTurnProgress = 0f;
         CurrentPhase = Phase.Counting;
     }
 
@@ -182,8 +198,8 @@ public class MapFlipController : MonoBehaviour
     private void AnimateTurn()
     {
         float t = Mathf.Clamp01(elapsed / turnSeconds);
-        float eased = t * t * (3f - 2f * t);
-        ApplyTurn(eased);
+        visualTurnProgress = t * t * (3f - 2f * t);
+        ApplyTurn(visualTurnProgress);
 
         if (t >= 1f)
         {
@@ -219,6 +235,7 @@ public class MapFlipController : MonoBehaviour
         Physics2D.SyncTransforms();
 
         FlipCount++;
+        visualTurnProgress = 0f;
         CurrentPhase = Phase.Counting;
         elapsed = 0f;
         Flipped?.Invoke();
