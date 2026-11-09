@@ -56,7 +56,6 @@ public static class Level0Builder
 
     private const float PreviewSeconds = 5f;
     private const float RevealSeconds = 2f;
-    private const int RevealCharges = 3;
     private const float SecondsBetweenFlips = 8f;
     private const float FlipWarningSeconds = 2f;
 
@@ -419,10 +418,9 @@ public static class Level0Builder
         serialized.FindProperty("followSize").floatValue = FollowCameraSize;
         serialized.FindProperty("revealSize").floatValue = RevealCameraSize;
         serialized.FindProperty("revealZoomSeconds").floatValue = RevealCameraZoomSeconds;
-        serialized.FindProperty("topBarShare").floatValue =
-            HudBuilder.TopBarHeight / HudBuilder.ReferenceHeight;
-        serialized.FindProperty("bottomBarShare").floatValue =
-            HudBuilder.BottomBarHeight / HudBuilder.ReferenceHeight;
+        // The new HUD reserves a small top strip and has no bottom legend.
+        serialized.FindProperty("topBarShare").floatValue = 0.105f;
+        serialized.FindProperty("bottomBarShare").floatValue = 0f;
         serialized.ApplyModifiedProperties();
         return follow;
     }
@@ -433,7 +431,6 @@ public static class Level0Builder
         SerializedObject serialized = new SerializedObject(gameManager);
         serialized.FindProperty("previewSeconds").floatValue = previewSeconds;
         serialized.FindProperty("revealSeconds").floatValue = RevealSeconds;
-        serialized.FindProperty("revealCharges").intValue = RevealCharges;
         serialized.FindProperty("darkIntensity").floatValue = 0f;
         serialized.FindProperty("mapFlip").objectReferenceValue = mapFlip;
         serialized.FindProperty("cameraFollow").objectReferenceValue = cameraFollow;

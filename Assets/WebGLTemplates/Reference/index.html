@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090a0d">
+  <title>IN THE DARK</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #090a0d; }
+    #unity-canvas { display: block; width: 100%; height: 100%; outline: none; background: #090a0d; }
+    #loading { position: fixed; inset: 0; display: grid; place-content: center; gap: 24px;
+      background: #090a0d; color: #f2f2f4; font: 600 16px/1.5 Arial, sans-serif; text-align: center; }
+    #loading-title { font-size: 30px; letter-spacing: .2em; }
+    #progress { width: min(300px, 75vw); height: 3px; appearance: none; border: none; }
+    #progress::-webkit-progress-bar { background: #27282d; }
+    #progress::-webkit-progress-value { background: #ffd12a; }
+    #progress::-moz-progress-bar { background: #ffd12a; }
+  </style>
+</head>
+<body>
+  <canvas id="unity-canvas" width="1920" height="1080" tabindex="0" aria-label="In the Dark game"></canvas>
+  <div id="loading" role="status">
+    <div id="loading-title">IN THE DARK</div>
+    <progress id="progress" max="1" value="0" aria-label="Loading game"></progress>
+    <div id="loading-message">Loading</div>
+  </div>
+  <script src="Build/{{{ LOADER_FILENAME }}}"></script>
+  <script>
+    const canvas = document.getElementById("unity-canvas");
+    createUnityInstance(canvas, {
+      arguments: [],
+      dataUrl: "Build/{{{ DATA_FILENAME }}}",
+      frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_THREADS
+      workerUrl: "Build/{{{ WORKER_FILENAME }}}",
+#endif
+#if USE_WASM
+      codeUrl: "Build/{{{ CODE_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+      symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
+#endif
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    }, progress => { document.getElementById("progress").value = progress; })
+    .then(() => {
+      document.getElementById("loading").remove();
+      canvas.focus();
+    })
+    .catch(error => {
+      document.getElementById("loading-message").textContent = "The game could not start. Please refresh to try again.";
+      console.error(error);
+    });
+  </script>
+</body>
+</html>

@@ -50,6 +50,14 @@ public static class GameAnalytics
         attemptsByLevel.Clear();
         ready = false;
         failed = false;
+#if UNITY_EDITOR
+        // Automated UI smoke runs must not send synthetic gameplay analytics.
+        if (Application.isBatchMode && Array.IndexOf(Environment.GetCommandLineArgs(), "-uiReviewSmoke") >= 0)
+        {
+            failed = true;
+            return;
+        }
+#endif
         Initialize();
     }
 
