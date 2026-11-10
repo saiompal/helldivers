@@ -68,14 +68,13 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        steer = 0f;
         if (keyboard != null)
         {
             steer = (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f)
               - (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? 1f : 0f);
 
-            if (keyboard.spaceKey.wasPressedThisFrame ||
-                keyboard.wKey.wasPressedThisFrame ||
-                keyboard.upArrowKey.wasPressedThisFrame)
+            if (keyboard.spaceKey.wasPressedThisFrame)
             {
                 jumpRequestedUntil = Time.time + jumpBufferSeconds;
             }
