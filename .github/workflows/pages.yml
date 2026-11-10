@@ -28,7 +28,7 @@ jobs:
       - name: Assemble site (one folder per tag, from each tag's docs/ build)
         run: |
           mkdir site
-          for v in alpha beta; do
+          for v in alpha beta beta-build; do
             mkdir -p "site/$v"
             git archive "refs/tags/$v" docs | tar -x -C "site/$v" --strip-components=1
           done
@@ -43,6 +43,7 @@ jobs:
           <ul>
             <li><a href="alpha/">Alpha</a></li>
             <li><a href="beta/">Beta</a></li>
+            <li><a href="beta-build/">Beta Build</a></li>
             <li><a href="betawmob/">Beta (Mobile Controls)</a></li>
           </ul>
           HTML
