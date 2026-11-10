@@ -17,6 +17,12 @@ public static class ProjectBuild
     public static void RebuildUiAndWebGl()
     {
         RebuildUiOnly();
+        BuildWebGl();
+    }
+
+    [MenuItem("Tools/Build/WebGL from Current Scenes")]
+    public static void BuildWebGl()
+    {
         PlayerSettings.WebGL.template = "PROJECT:Reference";
 
         string[] scenes = EditorBuildSettings.scenes

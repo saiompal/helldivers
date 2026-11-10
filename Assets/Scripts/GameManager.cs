@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // Runs a level: a short preview of the whole map with the lights on, then
 // the camera zooms in on the player and the lights go out, leaving only a
@@ -85,6 +86,8 @@ public class GameManager : MonoBehaviour
     private float initialVisionInnerRadius;
     private float initialVisionOuterRadius;
     private RunTrajectory trajectory;
+    private Button mobileTorchButton;
+    private TMP_Text mobileTorchLabel;
 
     private bool IsActive =>
         phase == Phase.Playing ||
@@ -137,6 +140,7 @@ public class GameManager : MonoBehaviour
         chargesRemaining = IsTutorial ? Mathf.Max(1, PlayerProgress.StartingLightCharges) : PlayerProgress.StartingLightCharges;
         UpdateChargesText();
         UpdateStarsText();
+        CreateMobileTorchButton();
 
         attempt = GameAnalytics.NextAttempt(levelName);
         GameAnalytics.Record("levelStart",
@@ -156,6 +160,7 @@ public class GameManager : MonoBehaviour
         }
 
         AnimateVisionRadius();
+        UpdateMobileTorchButton();
 
         if (IsActive)
         {
@@ -192,17 +197,68 @@ public class GameManager : MonoBehaviour
             SceneManager.LoadScene(menuScene);
         }
 
-        if (phase == Phase.Playing &&
-            keyboard.fKey.wasPressedThisFrame &&
-            chargesRemaining > 0)
+        if (keyboard.fKey.wasPressedThisFrame)
         {
-            StartCoroutine(TemporaryReveal());
+            RequestReveal();
         }
 
         if (phase == Phase.Won && keyboard.nKey.wasPressedThisFrame)
         {
             LoadNextLevel();
         }
+    }
+
+    public void RequestReveal()
+    {
+        if (phase == Phase.Playing && chargesRemaining > 0)
+            StartCoroutine(TemporaryReveal());
+    }
+
+    private void CreateMobileTorchButton()
+    {
+        if ((!Application.isMobilePlatform && Touchscreen.current == null) ||
+            statusText.canvas == null)
+            return;
+
+        mobileTorchButton = GameUi.Button("Mobile Torch",
+            statusText.canvas.rootCanvas.transform, "LIGHT", Vector2.zero,
+            new Vector2(160, 160), false, false);
+        mobileTorchButton.onClick.AddListener(RequestReveal);
+        var navigation = mobileTorchButton.navigation;
+        navigation.mode = Navigation.Mode.None;
+        mobileTorchButton.navigation = navigation;
+        mobileTorchLabel = mobileTorchButton.transform.Find("Label").GetComponent<TMP_Text>();
+        var icon = GameUi.Rect("Torch Icon", mobileTorchButton.transform,
+            Vector2.zero, Vector2.one);
+        var graphic = icon.gameObject.AddComponent<FlashlightGraphic>();
+        graphic.color = GameplayHudRuntime.LightBlue;
+        graphic.raycastTarget = false;
+        UpdateMobileTorchButton();
+    }
+
+    private void UpdateMobileTorchButton()
+    {
+        if (mobileTorchButton == null) return;
+
+        // Keep the touch target readable in portrait and landscape, outside device cutouts.
+        float scale = Mathf.Max(statusText.canvas.rootCanvas.scaleFactor, .001f);
+        float pixels = Mathf.Clamp(Mathf.Min(Screen.width, Screen.height) * .16f, 64f, 88f);
+        float size = pixels / scale;
+        Rect safe = Screen.safeArea;
+        var rect = (RectTransform)mobileTorchButton.transform;
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1, 0);
+        rect.sizeDelta = Vector2.one * size;
+        rect.anchoredPosition = new Vector2(
+            -(Screen.width - safe.xMax + 20f) / scale, (safe.yMin + 20f) / scale);
+        mobileTorchLabel.rectTransform.sizeDelta = new Vector2(size, size * .25f);
+        mobileTorchLabel.rectTransform.anchoredPosition = new Vector2(0, -size * .3f);
+        mobileTorchLabel.fontSize = size * .14f;
+        mobileTorchLabel.text = $"LIGHT {chargesRemaining}";
+        var icon = (RectTransform)rect.Find("Torch Icon");
+        icon.sizeDelta = Vector2.one * size * .55f;
+        icon.anchoredPosition = new Vector2(0, size * .12f);
+        mobileTorchButton.interactable = phase == Phase.Playing && chargesRemaining > 0;
+        mobileTorchButton.gameObject.SetActive(!IsFinished);
     }
 
     private IEnumerator BeginLevel()
