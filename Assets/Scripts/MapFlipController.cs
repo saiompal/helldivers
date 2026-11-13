@@ -101,7 +101,7 @@ public class MapFlipController : MonoBehaviour
         CurrentPhase = Phase.Counting;
     }
 
-    // Skips the wait and starts the red warning now. Used by the tutorial.
+    // Skips the wait and starts the red warning immediately.
     public void FlipSoon()
     {
         if (enabled && CurrentPhase == Phase.Counting)

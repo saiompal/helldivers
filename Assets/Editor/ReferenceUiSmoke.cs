@@ -17,6 +17,7 @@ public static class ReferenceUiSmoke
 {
     private const string Running = "ReferenceUiSmoke.Running";
     private const string BuildAfterRun = "ReferenceUiSmoke.BuildAfterRun";
+    private const string TutorialBuildOnly = "ReferenceUiSmoke.TutorialBuildOnly";
     private static int stage;
     private static double started, stageTime;
     private static bool initialized;
@@ -32,18 +33,42 @@ public static class ReferenceUiSmoke
         SessionState.SetBool(BuildAfterRun, true);
         Run();
     }
+    public static void RebuildTutorialAndVerify()
+    {
+        TutorialBuilder.BuildFromCommandLine();
+        SessionState.SetBool(TutorialBuildOnly, true);
+        RunAndBuild();
+    }
     private static void OnPlayModeChanged(PlayModeStateChange state)
     {
-        if (state != PlayModeStateChange.EnteredEditMode || !Application.isBatchMode || !SessionState.GetBool(BuildAfterRun, false)) return;
+        if (state != PlayModeStateChange.EnteredEditMode || !Application.isBatchMode ||
+            !SessionState.GetBool(BuildAfterRun, false)) return;
         SessionState.SetBool(BuildAfterRun, false);
         EditorApplication.delayCall += () =>
         {
-            try { ProjectBuild.RebuildUiAndWebGl(); EditorApplication.Exit(0); }
-            catch (Exception exception) { Debug.LogException(exception); EditorApplication.Exit(1); }
+            try
+            {
+                if (SessionState.GetBool(TutorialBuildOnly, false)) ProjectBuild.BuildWebGl();
+                else ProjectBuild.RebuildUiAndWebGl();
+                File.AppendAllText("UIReview/tutorial-rework-result.txt", "\nPASS: WebGL build completed.\n");
+                SessionState.SetBool(TutorialBuildOnly, false);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception exception)
+            {
+                File.AppendAllText("UIReview/tutorial-rework-result.txt", "\nBUILD FAILED: " + exception);
+                Debug.LogException(exception);
+                EditorApplication.Exit(1);
+            }
         };
     }
     public static void Run()
     {
+        Directory.CreateDirectory("UIReview");
+        stage = 0;
+        initialized = false;
+        failure = null;
+        TutorialChecks.Reset();
         SessionState.SetBool(Running, true);
         EditorSceneManager.OpenScene("Assets/Scenes/MainMenu.unity");
         EditorApplication.EnterPlaymode();
@@ -71,7 +96,11 @@ public static class ReferenceUiSmoke
                     var root = menu.transform.Find(MainMenu.LayoutName);
                     Require(Mathf.Abs(root.Find("Home/Start").GetComponent<RectTransform>().anchoredPosition.x) < .01f, "Start button should be centered");
                     Require(Mathf.Abs(root.Find("Home/Help Button").GetComponent<RectTransform>().anchoredPosition.x) < .01f, "How to Play button should be centered");
-                    Require(root.Find("Home/Tutorial") == null, "Tutorial button is still visible");
+                    var tutorial = root.Find("Home/Tutorial");
+                    Require(tutorial != null && tutorial.gameObject.activeInHierarchy && tutorial.GetComponent<Button>().interactable,
+                        "Tutorial button should be visible and available");
+                    Require(Mathf.Abs(tutorial.GetComponent<RectTransform>().anchoredPosition.x) < .01f,
+                        "Tutorial button should be centered");
                     Require(!root.Find("Home/How To Play").gameObject.activeSelf, "Controls should start hidden");
                     root.Find("Home/Help Button").GetComponent<Button>().onClick.Invoke();
                     Require(root.Find("Home/How To Play").gameObject.activeSelf, "Help button did not open controls");
@@ -89,29 +118,10 @@ public static class ReferenceUiSmoke
                     root.Find("Level Map/Back").GetComponent<Button>().onClick.Invoke();
                     Require(root.Find("Home").gameObject.activeSelf, "Back did not open home");
                     TrajectoryChecks.VerifyRecording();
-                    SceneManager.LoadScene("Tutorial"); Next(); break;
+                    tutorial.GetComponent<Button>().onClick.Invoke(); Next(); break;
                 case 1:
-                    if (game == null || !game.IsPlaying) return;
-                    Require(game.IsTutorial && game.ChargesRemaining >= 1, "Fresh tutorial has no reveal charge");
-                    var routine = (IEnumerator)typeof(GameManager).GetMethod("TemporaryReveal", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(game, null);
-                    game.StartCoroutine(routine); Next(); break;
-                case 2:
-                    if (now - stageTime < 2.5) return;
-                    Require(game.RevealsUsed == 1 && game.ChargesRemaining == 0, "Tutorial reveal did not spend its charge");
-                    Require(game.TryCollectStar(), "Tutorial star was not collectible");
-                    Require(game.ChargesRemaining == 1, "Star did not restore one charge");
-                    Require(game.GetComponent<RunTrajectory>().IsRecording && !game.GetComponent<RunTrajectory>().IsVisible,
-                        "Trajectory should record invisibly during light reveals");
-                    UnityEngine.Object.FindAnyObjectByType<MapFlipController>().FlipSoon(); Next(); break;
-                case 3:
-                    var flip = UnityEngine.Object.FindAnyObjectByType<MapFlipController>();
-                    if (flip.FlipCount == 0) return;
-                    Require(!flip.IsTurning, "Player remained frozen after turn");
-                    var hourglass = UnityEngine.Object.FindAnyObjectByType<HourglassGraphic>();
-                    if (hourglass.Fill01 > .01f) return;
-                    game.TryExit();
-                    Require(game.IsFinished, "Tutorial exit did not complete");
-                    SceneManager.LoadScene("Level0"); Next(); break;
+                    if (!TutorialChecks.Tick()) return;
+                    SceneManager.LoadScene("Level0"); stage = 4; stageTime = now; break;
                 case 4:
                     if (game == null || !game.IsPlaying) return;
                     if (now - stageTime < 7.0) return; // Let preview and the follow-zoom transition finish.
@@ -175,6 +185,9 @@ public static class ReferenceUiSmoke
             SessionState.SetBool(BuildAfterRun, false);
             Debug.LogException(exception);
             File.WriteAllText("UIReview/play-smoke.txt", "FAILED: " + exception);
+            File.WriteAllText("UIReview/tutorial-rework-result.txt", "FAILED: " + exception);
+            TutorialChecks.Reset();
+            PlayerProgress.ResetLocalProgress(); PlayerProgress.UseTestStorage(false);
             EditorApplication.Exit(1);
         }
     }
@@ -209,6 +222,8 @@ public static class ReferenceUiSmoke
         SessionState.SetBool(Running, false);
         File.WriteAllText("UIReview/play-smoke.txt", "PASS: maze-local recording across repeated flips, stationary deduplication, pathway filtering of jumps/local loops, wall-safe shortcutting, preserved pickup detours and exact endpoints, hidden recording during play/reveals, animated win reveal, replay/failure cleanup, completion overview at 16:9/4:3/9:16, menu popup/navigation, single completion stars, light reveal/rewards, red flip animation, original world art and all five HUDs. Completion images use a scripted render fixture.\n");
         Debug.Log("REFERENCE_UI_PLAY_SMOKE_SUCCESS");
+        File.WriteAllText("UIReview/tutorial-rework-result.txt",
+            "PASS: 10-second tutorial preview; real movement and jump; physical star pickup and light reward; F reveal; five-second grace period; automatic countdown, warning and flip; reachable exit; completion and replay; existing menu and all five level HUD checks.\n");
         if (SessionState.GetBool(BuildAfterRun, false)) EditorApplication.ExitPlaymode();
         else EditorApplication.Exit(0);
     }

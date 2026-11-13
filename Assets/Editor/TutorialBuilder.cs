@@ -11,25 +11,32 @@ public static class TutorialBuilder
     internal const string ScenePath = "Assets/Scenes/Tutorial.unity";
 
     // # wall   . open space   S player start   E exit   * star
-    // A low block to jump, a star to grab, then a wall with a gap at the
-    // top. The gap and the exit hang up high until the map flips and drops
-    // them to the floor.
+    // A low block to jump, a star on the far side, and an elevated exit.
+    // The automatic flip brings the exit down to the floor. The rest of
+    // the route is open so the lesson focuses on movement and flipping.
     private static readonly string[] Layout =
     {
-        "########################",
-        "#..................EE...#",
-        "#..................EE...#",
-        "#..........#...........#",
-        "#..........#...........#",
-        "#.......*..#...........#",
-        "#....##....#...........#",
-        "#SS..##....#...........#",
-        "########################",
+        "############################",
+        "#......................EE..#",
+        "#......................EE..#",
+        "#..........................#",
+        "#..........................#",
+        "#..........................#",
+        "#..........................#",
+        "#..........................#",
+        "#.....##...................#",
+        "#.SS..##...*...............#",
+        "############################",
     };
 
-    // Long preview to memorize the map, and the flip only comes when the guide asks for it.
+    // The guide starts this normal automatic cycle five seconds after the first star.
     private const float PreviewSeconds = 10f;
-    private const float NoAutoFlipSeconds = 9999f;
+    private const float SecondsBetweenFlips = 8f;
+
+    public static void BuildFromCommandLine()
+    {
+        if (!Build()) throw new System.InvalidOperationException("Could not rebuild the tutorial.");
+    }
 
     [MenuItem("Tools/Tutorial/Build Tutorial")]
     private static void BuildMenuItem()
@@ -42,7 +49,7 @@ public static class TutorialBuilder
 
     internal static bool Build()
     {
-        if (!Level0Builder.Build(ScenePath, Layout, PreviewSeconds, NoAutoFlipSeconds))
+        if (!Level0Builder.Build(ScenePath, Layout, PreviewSeconds, SecondsBetweenFlips))
         {
             return false;
         }

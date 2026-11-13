@@ -47,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     public bool IsGrounded { get; private set; }
+    public event System.Action Jumped;
 
     private bool Active =>
         GameManager.Instance == null || GameManager.Instance.CanPlayerMove;
@@ -168,6 +169,7 @@ public class PlayerMovement : MonoBehaviour
             jumpRequestedUntil = float.NegativeInfinity;
             groundedUntil = float.NegativeInfinity;
             IsGrounded = false;
+            Jumped?.Invoke();
         }
 
         Vector2 limited = body.linearVelocity;

@@ -158,10 +158,17 @@ public static class Level0Builder
         // Objects from the old version of the level.
         DestroyIfFound("Hazards");
         DestroyIfFound("Lantern");
-        DestroyIfFound("Stars");
+        // "Stars" is also the HUD panel's name. Remove world collectibles
+        // explicitly so rebuilding cannot leave old stars behind.
+        foreach (var collectible in Object.FindObjectsByType<StarCollectible>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None))
+            Object.DestroyImmediate(collectible.gameObject);
 
         // Everything under the map root turns when the maze flips.
         Transform map = FindOrCreate("Map").transform;
+        for (int i = map.childCount - 1; i >= 0; i--)
+            if (map.GetChild(i).name == "Stars")
+                Object.DestroyImmediate(map.GetChild(i).gameObject);
         map.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
         map.localScale = Vector3.one;
         floor.transform.SetParent(map, true);

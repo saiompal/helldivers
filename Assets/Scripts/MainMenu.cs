@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    public const string LayoutName = "Reference Menu v5";
+    public const string LayoutName = "Reference Menu v6";
     private Transform layout, home, map, help;
     private Coroutine helpAnimation;
 
@@ -43,8 +43,9 @@ public class MainMenu : MonoBehaviour
         var title = GameUi.Text("Title", frame.transform, "IN THE DARK", 79, Vector2.zero, new Vector2(1300, 150));
         title.characterSpacing = 13;
         GameUi.Shape("Title Diamond", frame.transform, UiShapeGraphic.Shape.Spark, new Vector2(0, -87.5f), new Vector2(36, 36), GameUi.White, GameUi.White, 0);
-        GameUi.Button("Start", root, "Start", new Vector2(0, -50), new Vector2(610, 122), true);
-        GameUi.Button("Help Button", root, "How to Play", new Vector2(0, -205), new Vector2(610, 122));
+        GameUi.Button("Start", root, "Start", Vector2.zero, new Vector2(610, 122), true);
+        GameUi.Button("Tutorial", root, "Tutorial", new Vector2(0, -150), new Vector2(610, 122));
+        GameUi.Button("Help Button", root, "How to Play", new Vector2(0, -300), new Vector2(610, 122));
         var help = GameUi.Shape("How To Play", root, UiShapeGraphic.Shape.Rounded, new Vector2(0, -110), new Vector2(615, 460), GameUi.Dark, GameUi.White, 2.4f, 28);
         help.raycastTarget = true;
         help.gameObject.AddComponent<CanvasGroup>();
@@ -59,7 +60,7 @@ public class MainMenu : MonoBehaviour
         Key(help.transform, "Space", new Vector2(-170, -33), 164); HelpText(help.transform, "Jump", -33);
         Key(help.transform, "F", new Vector2(-170, -114), 62); HelpText(help.transform, "Use Light", -114);
         Key(help.transform, "R", new Vector2(-170, -195), 62); HelpText(help.transform, "Restart", -195);
-        var quit = GameUi.Button("Quit", root, "Quit", new Vector2(0, -390), new Vector2(220, 64), false, false);
+        var quit = GameUi.Button("Quit", root, "Quit", new Vector2(0, -445), new Vector2(220, 64), false, false);
         quit.transform.Find("Label").GetComponent<TMP_Text>().fontSize = 26;
     }
     private static void Key(Transform root, string text, Vector2 position, float width)
@@ -107,6 +108,7 @@ public class MainMenu : MonoBehaviour
         layout = transform.Find(LayoutName); home = layout.Find("Home"); map = layout.Find("Level Map");
         help = home.Find("How To Play");
         home.Find("Start").GetComponent<Button>().onClick.AddListener(ShowLevelMap);
+        home.Find("Tutorial").GetComponent<Button>().onClick.AddListener(LoadTutorial);
         home.Find("Help Button").GetComponent<Button>().onClick.AddListener(ShowHelp);
         help.Find("Close").GetComponent<Button>().onClick.AddListener(HideHelp);
         home.Find("Quit").GetComponent<Button>().onClick.AddListener(Quit);

@@ -27,6 +27,11 @@ public class MobileControls : MonoBehaviour
 
     private void Start()
     {
+        if (!DeviceVisibility.IsMobileDevice)
+        {
+            enabled = false;
+            return;
+        }
 #if UNITY_WEBGL && !UNITY_EDITOR
         StartTiltSensor();
 #endif

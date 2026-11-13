@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour
         trajectory = gameObject.AddComponent<RunTrajectory>();
         trajectory.Configure(mapFlip != null ? mapFlip.PlayerTransform : null,
             mapFlip != null ? mapFlip.MapRoot : null, mapFlip, cameraFollow);
-        chargesRemaining = IsTutorial ? Mathf.Max(1, PlayerProgress.StartingLightCharges) : PlayerProgress.StartingLightCharges;
+        chargesRemaining = IsTutorial ? 0 : PlayerProgress.StartingLightCharges;
         UpdateChargesText();
         UpdateStarsText();
         CreateMobileTorchButton();
@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour
 
     private void CreateMobileTorchButton()
     {
-        if ((!Application.isMobilePlatform && Touchscreen.current == null) ||
+        if (!DeviceVisibility.IsMobileDevice ||
             statusText.canvas == null)
             return;
 
@@ -278,7 +278,17 @@ public class GameManager : MonoBehaviour
         {
             if (countdown != null)
             {
-                countdown.text =
+                if (IsTutorial)
+                {
+                    float scale = Mathf.Max(statusText.canvas.rootCanvas.scaleFactor, .001f);
+                    countdown.fontSize = Mathf.Clamp(Mathf.Min(Screen.width, Screen.height) * .15f, 72f, 132f) / scale;
+                    countdown.rectTransform.sizeDelta = new Vector2(
+                        Mathf.Min(Screen.safeArea.width - 32f, 760f) / scale, 280f / scale);
+                    countdown.text = "<size=24%>Memorize the map. Soon, you'll be...</size>\n" +
+                        "<size=45%><color=#F2F2F5><b>IN THE DARK</b></color></size>\n" +
+                        $"<b>{Mathf.CeilToInt(timeRemaining)}</b>";
+                }
+                else countdown.text =
                     $"<size=40%>MEMORIZE</size>\n<b>{Mathf.CeilToInt(timeRemaining)}</b>";
             }
 
@@ -301,7 +311,7 @@ public class GameManager : MonoBehaviour
             cameraFollow.FollowPlayer();
         }
 
-        if (mapFlip != null)
+        if (mapFlip != null && !IsTutorial)
         {
             mapFlip.Begin();
         }
@@ -468,16 +478,7 @@ public class GameManager : MonoBehaviour
 
     private void UpdateStatusText()
     {
-        string state = phase == Phase.Revealing
-            ? $"<color={LanternColor}>Light on</color>"
-            : string.Empty;
-
-        if (Time.time < toastUntil)
-        {
-            state = string.IsNullOrEmpty(state) ? toast : $"{toast}   \u00B7   {state}";
-        }
-
-        statusText.text = state;
+        statusText.text = Time.time < toastUntil ? toast : string.Empty;
     }
 
     private void UpdateChargesText()
