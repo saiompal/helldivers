@@ -77,6 +77,11 @@ public class GameManager : MonoBehaviour
     private string levelName;
     private int attempt;
     private int revealsUsed;
+    // Light-economy and "stuck" signals for analytics.
+    private int startingCharges;
+    private int revealsDenied;
+    private bool deniedSinceLastStar;
+    private float lastStarRunSeconds;
     private string toast;
     private float toastUntil;
     private Coroutine chargesPulse;
@@ -101,6 +106,11 @@ public class GameManager : MonoBehaviour
     };
 
     private int FlipCount => mapFlip != null ? mapFlip.FlipCount : 0;
+
+    // Time since the last star (or since the lights went out, before the
+    // first star). A long gap before a restart or quit means the player was
+    // stuck on the next star.
+    private float SecondsSinceStar => Mathf.Max(0f, RunSeconds - lastStarRunSeconds);
 
     private void Awake()
     {
@@ -138,6 +148,7 @@ public class GameManager : MonoBehaviour
         trajectory.Configure(mapFlip != null ? mapFlip.PlayerTransform : null,
             mapFlip != null ? mapFlip.MapRoot : null, mapFlip, cameraFollow);
         chargesRemaining = IsTutorial ? Mathf.Max(1, PlayerProgress.StartingLightCharges) : PlayerProgress.StartingLightCharges;
+        startingCharges = chargesRemaining;
         UpdateChargesText();
         UpdateStarsText();
         CreateMobileTorchButton();
@@ -145,7 +156,8 @@ public class GameManager : MonoBehaviour
         attempt = GameAnalytics.NextAttempt(levelName);
         GameAnalytics.Record("levelStart",
             ("levelName", levelName),
-            ("attempt", attempt));
+            ("attempt", attempt),
+            ("startingCharges", startingCharges));
 
         StartCoroutine(BeginLevel());
     }
@@ -210,8 +222,32 @@ public class GameManager : MonoBehaviour
 
     public void RequestReveal()
     {
-        if (phase == Phase.Playing && chargesRemaining > 0)
+        if (phase != Phase.Playing)
+            return;
+
+        if (chargesRemaining > 0)
             StartCoroutine(TemporaryReveal());
+        else
+            RecordRevealDenied();
+    }
+
+    // The player wanted light but had none: the clearest sign charges are
+    // too scarce. Every press is counted for the end-of-run events, but only
+    // the first press per dry spell (until the next star) is sent on its own,
+    // so button-mashing doesn't flood the event stream.
+    private void RecordRevealDenied()
+    {
+        revealsDenied++;
+        if (deniedSinceLastStar)
+            return;
+
+        deniedSinceLastStar = true;
+        GameAnalytics.Record("revealDenied",
+            ("levelName", levelName),
+            ("attempt", attempt),
+            ("runSeconds", RunSeconds),
+            ("starsCollected", starsCollected),
+            ("secondsSinceStar", SecondsSinceStar));
     }
 
     private void CreateMobileTorchButton()
@@ -347,6 +383,7 @@ public class GameManager : MonoBehaviour
 
         GameAnalytics.Record("revealUsed",
             ("levelName", levelName),
+            ("attempt", attempt),
             ("runSeconds", RunSeconds),
             ("starsCollected", starsCollected),
             ("chargesRemaining", chargesRemaining));
@@ -381,9 +418,14 @@ public class GameManager : MonoBehaviour
 
         GameAnalytics.Record("starCollected",
             ("levelName", levelName),
+            ("attempt", attempt),
             ("runSeconds", RunSeconds),
             ("starsCollected", starsCollected),
-            ("starsTotal", starsTotal));
+            ("starsTotal", starsTotal),
+            ("chargesRemaining", chargesRemaining),
+            ("secondsSinceStar", SecondsSinceStar));
+        lastStarRunSeconds = RunSeconds;
+        deniedSinceLastStar = false;
 
         const string reward = "  \u00B7  +1 light charge";
 
@@ -562,7 +604,10 @@ public class GameManager : MonoBehaviour
             ("starsCollected", starsCollected),
             ("starsTotal", starsTotal),
             ("revealsUsed", revealsUsed),
-            ("flipCount", FlipCount));
+            ("flipCount", FlipCount),
+            ("startingCharges", startingCharges),
+            ("chargesRemaining", chargesRemaining),
+            ("revealsDenied", revealsDenied));
         GameAnalytics.Flush();
 
         string next = HasNextLevel()
@@ -600,7 +645,11 @@ public class GameManager : MonoBehaviour
             ("runSeconds", RunSeconds),
             ("starsCollected", starsCollected),
             ("revealsUsed", revealsUsed),
-            ("flipCount", FlipCount));
+            ("flipCount", FlipCount),
+            ("startingCharges", startingCharges),
+            ("chargesRemaining", chargesRemaining),
+            ("revealsDenied", revealsDenied),
+            ("secondsSinceStar", SecondsSinceStar));
         GameAnalytics.Flush();
 
         statusText.text =
@@ -653,7 +702,11 @@ public class GameManager : MonoBehaviour
             ("runSeconds", RunSeconds),
             ("starsCollected", starsCollected),
             ("revealsUsed", revealsUsed),
-            ("flipCount", FlipCount));
+            ("flipCount", FlipCount),
+            ("startingCharges", startingCharges),
+            ("chargesRemaining", chargesRemaining),
+            ("revealsDenied", revealsDenied),
+            ("secondsSinceStar", SecondsSinceStar));
     }
 
     private static bool HasNextLevel()
@@ -671,6 +724,21 @@ public class GameManager : MonoBehaviour
                 SceneManager.GetActiveScene().name, out int levelIndex);
             SceneManager.LoadScene(LevelCatalog.GetSceneName(levelIndex + 1));
         }
+    }
+
+    // On WebGL a closed tab drops anything still queued, so send it as soon
+    // as the page loses focus. Runs that end this way have a levelStart but
+    // no ending event; the dashboard counts them as abandoned.
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (!hasFocus)
+            GameAnalytics.Flush();
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused)
+            GameAnalytics.Flush();
     }
 
     private void OnDestroy()
