@@ -8,14 +8,14 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    public const string LayoutName = "Reference Menu v6";
+    public const string LayoutName = "Reference Menu v8";
     private Transform layout, home, map, help;
     private Coroutine helpAnimation;
 
     private void Awake()
     {
         layout = transform.Find(LayoutName);
-        if (layout == null) RebuildUi();
+        if (layout == null || layout.Find("Level Map/Level " + (LevelCatalog.Count - 1)) == null) RebuildUi();
         Bind();
     }
     private void Start() => ShowHome();
@@ -46,20 +46,21 @@ public class MainMenu : MonoBehaviour
         GameUi.Button("Start", root, "Start", Vector2.zero, new Vector2(610, 122), true);
         GameUi.Button("Tutorial", root, "Tutorial", new Vector2(0, -150), new Vector2(610, 122));
         GameUi.Button("Help Button", root, "How to Play", new Vector2(0, -300), new Vector2(610, 122));
-        var help = GameUi.Shape("How To Play", root, UiShapeGraphic.Shape.Rounded, new Vector2(0, -110), new Vector2(615, 460), GameUi.Dark, GameUi.White, 2.4f, 28);
+        var help = GameUi.Shape("How To Play", root, UiShapeGraphic.Shape.Rounded, new Vector2(0, -110), new Vector2(615, 540), GameUi.Dark, GameUi.White, 2.4f, 28);
         help.raycastTarget = true;
         help.gameObject.AddComponent<CanvasGroup>();
-        var close = GameUi.Button("Close", help.transform, "X", new Vector2(265, 191), new Vector2(42, 40), false, false);
+        var close = GameUi.Button("Close", help.transform, "X", new Vector2(265, 231), new Vector2(42, 40), false, false);
         close.transform.Find("Label").GetComponent<TMP_Text>().fontSize = 20;
-        GameUi.Text("Heading", help.transform, "How to Play", 37, new Vector2(0, 170), new Vector2(540, 60));
-        GameUi.Divider(help.transform, 125, 550);
-        Key(help.transform, "A", new Vector2(-220, 48), 62);
-        GameUi.Text("Plus", help.transform, "+", 25, new Vector2(-171, 48), new Vector2(30, 45));
-        Key(help.transform, "D", new Vector2(-121, 48), 62);
-        HelpText(help.transform, "Move Left / Right", 48);
-        Key(help.transform, "Space", new Vector2(-170, -33), 164); HelpText(help.transform, "Jump", -33);
-        Key(help.transform, "F", new Vector2(-170, -114), 62); HelpText(help.transform, "Use Light", -114);
-        Key(help.transform, "R", new Vector2(-170, -195), 62); HelpText(help.transform, "Restart", -195);
+        GameUi.Text("Heading", help.transform, "How to Play", 37, new Vector2(0, 210), new Vector2(540, 60));
+        GameUi.Divider(help.transform, 165, 550);
+        Key(help.transform, "A", new Vector2(-220, 100), 62);
+        GameUi.Text("Plus", help.transform, "+", 25, new Vector2(-171, 100), new Vector2(30, 45));
+        Key(help.transform, "D", new Vector2(-121, 100), 62);
+        HelpText(help.transform, "Move Left / Right", 100);
+        Key(help.transform, "Space", new Vector2(-170, 20), 164); HelpText(help.transform, "Jump", 20);
+        Key(help.transform, "F", new Vector2(-170, -60), 62); HelpText(help.transform, "Use Light", -60);
+        Key(help.transform, "Q", new Vector2(-170, -140), 62); HelpText(help.transform, "Leave Shadow", -140);
+        Key(help.transform, "R", new Vector2(-170, -220), 62); HelpText(help.transform, "Restart", -220);
         var quit = GameUi.Button("Quit", root, "Quit", new Vector2(0, -445), new Vector2(220, 64), false, false);
         quit.transform.Find("Label").GetComponent<TMP_Text>().fontSize = 26;
     }
@@ -105,7 +106,10 @@ public class MainMenu : MonoBehaviour
     }
     private void Bind()
     {
-        layout = transform.Find(LayoutName); home = layout.Find("Home"); map = layout.Find("Level Map");
+        // RebuildUi may have replaced a baked layout this frame. Keep the new
+        // reference while Unity waits until frame end to destroy the old one.
+        if (layout == null) layout = transform.Find(LayoutName);
+        home = layout.Find("Home"); map = layout.Find("Level Map");
         help = home.Find("How To Play");
         home.Find("Start").GetComponent<Button>().onClick.AddListener(ShowLevelMap);
         home.Find("Tutorial").GetComponent<Button>().onClick.AddListener(LoadTutorial);

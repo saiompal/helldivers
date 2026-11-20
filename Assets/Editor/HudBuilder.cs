@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -30,7 +31,8 @@ public static class HudBuilder
     public static void RebuildAllHuds()
     {
         string original = SceneManager.GetActiveScene().path;
-        foreach (string name in new[] { "Tutorial", "Level0", "Level1", "Level2", "Level3", "Level4" })
+        foreach (string name in new[] { "Tutorial" }.Concat(
+            Enumerable.Range(0, LevelCatalog.Count).Select(LevelCatalog.GetSceneName)))
         {
             string path = "Assets/Scenes/" + name + ".unity";
             if (!File.Exists(path)) continue;

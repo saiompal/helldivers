@@ -15,17 +15,20 @@ EditorBuildSettings:
     path: Assets/Scenes/Level0.unity
     guid: b4659be16773f40178cbe2e350e81a09
   - enabled: 1
-    path: Assets/Scenes/Level1.unity
-    guid: 85901628f67c245da94d6df2504c93d5
+    path: Assets/Scenes/ShadowLevel.unity
+    guid: 9c4757bcab7aae645b3fb7eef46d1d87
   - enabled: 1
     path: Assets/Scenes/Level2.unity
     guid: d608537acc5cc42b3915cca4fdc53cac
   - enabled: 1
-    path: Assets/Scenes/Level3.unity
-    guid: 3a711ff2564d74295ab2505a1e658e01
+    path: Assets/Scenes/LinkedMaps.unity
+    guid: e1b8ad7fa173f9541a99dcb55df50c84
   - enabled: 1
     path: Assets/Scenes/Level4.unity
     guid: 722e31a44f56949b1a8f8f4dfe46feb9
+  - enabled: 1
+    path: Assets/Scenes/ShadowLevel 2.unity
+    guid: 7ef361eecb1d84f49ad30854f8c91a1c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

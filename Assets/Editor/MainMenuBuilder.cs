@@ -9,6 +9,24 @@ using UnityEngine.UI;
 
 public static class MainMenuBuilder
 {
+    public static void BuildAndCapture()
+    {
+        BuildFromCommandLine();
+        PlayerProgress.UseTestStorage(true);
+        PlayerProgress.ResetLocalProgress();
+        try
+        {
+            Object.FindAnyObjectByType<MainMenu>().ShowLevelMap();
+            ReferenceUiReview.Capture("flowing-level-map", 1280, 720);
+        }
+        finally
+        {
+            PlayerProgress.ResetLocalProgress();
+            PlayerProgress.UseTestStorage(false);
+        }
+        EditorSceneManager.OpenScene("Assets/Scenes/MainMenu.unity");
+    }
+
     [MenuItem("Tools/UI/Rebuild Main Menu")]
     public static void BuildFromCommandLine()
     {
@@ -22,7 +40,8 @@ public static class MainMenuBuilder
         rect.gameObject.AddComponent<MainMenu>().RebuildUi();
         new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
         EditorSceneManager.SaveScene(scene, "Assets/Scenes/MainMenu.unity");
-        var paths = new[] { "MainMenu", "Tutorial", "Level0", "Level1", "Level2", "Level3", "Level4" };
+        var paths = new[] { "MainMenu", "Tutorial" }
+            .Concat(Enumerable.Range(0, LevelCatalog.Count).Select(LevelCatalog.GetSceneName));
         EditorBuildSettings.scenes = paths.Select(p => new EditorBuildSettingsScene("Assets/Scenes/" + p + ".unity", true)).ToArray();
         AssetDatabase.SaveAssets();
     }

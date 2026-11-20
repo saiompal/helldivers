@@ -8,8 +8,8 @@ their UI when they start, rather than showing a different fallback design.
 
 - Home: framed **IN THE DARK** title and centered Start/How to Play buttons. The
   controls box starts hidden and opens in the center; X or Escape dismisses it.
-  The tutorial scene remains available for development, with no menu button.
-- Map: one sequential curved route (1–2–3–4–5), five round level nodes,
+  The tutorial has its own button on the home screen.
+- Map: the original flowing curved route (1–2–3–4–5–6), six round level nodes,
   play/finish markers and Back. Locked nodes remain opaque and cannot be selected.
 - Completion: one outlined star per level fills yellow when that level is completed,
   independent of run time. Existing saved completions carry over. Time ratings,
@@ -22,7 +22,11 @@ their UI when they start, rather than showing a different fallback design.
   the flip cycle, pulses during the warning, rotates/enlarges during the actual
   turn, and resets afterward. Tutorial flips are triggered by the guide.
 - Extra live light charges expand the rail to five pips; additional charges use
-  a `+N` count. The tutorial supplies one starting charge for its F-light step.
+  a `+N` count. The tutorial starts empty and teaches F using a star's charge.
+  Completing the tutorial permanently adds one starting charge; displayed levels
+  1 and 3 each add one more, once each, for a maximum starting allowance of three.
+  Other levels and replays grant no additional permanent charges. Star rewards
+  during a run remain uncapped and reset to the earned allowance on a new run.
 - World elements retain their original sprites and colors. The added silver
   shading, rim graphics, and player/star halo sprites were removed. Their generated
   textures are backed up outside Assets in ignored `UIReview/RevertedArt/`.
@@ -55,7 +59,7 @@ scripted render fixture, not a recorded human playthrough.
 ## Rebuild
 
 In Unity, use **Tools > UI > Rebuild Menu and All HUDs** to save the current
-layout in MainMenu, Tutorial, and Level0–Level4. Use
+layout in MainMenu, Tutorial, and the six gameplay scenes in `LevelCatalog`. Use
 **Tools > Build > Rebuild UI and WebGL** to also rebuild `docs/`.
 The custom `Reference` WebGL template fills the browser with the game and a dark
 loading screen instead of the default small canvas, white margins, and footer.
@@ -73,7 +77,7 @@ Run `ReferenceUiSmoke.Run` in batch mode with `-uiReviewSmoke` for scene lifecyc
 checks. This uses isolated save keys and suppresses synthetic gameplay analytics.
 It exercises the hidden/open/closed help box, Start/Back, a light reveal, star
 rewards, a real flip and animated sand, completion stars, unlocking, replay,
-original world art, and all five HUDs.
+original world art, and all six level HUDs.
 
 The EditMode tests cover progression, saved rewards, completion persistence and
 legacy time-record independence. They use isolated save keys, leaving player saves intact.

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,7 +10,7 @@ using UnityEngine.InputSystem.LowLevel;
 internal static class TutorialChecks
 {
     private static int stage;
-    private static float since, starAt;
+    private static float since, starAt, plateAt;
     private static Keyboard keyboard;
     private static TMP_Text hint;
     private static InputSettings.BackgroundBehavior backgroundBehavior;
@@ -28,7 +29,7 @@ internal static class TutorialChecks
         keyboard = null;
         hint = null;
         stage = 0;
-        since = starAt = -1f;
+        since = starAt = plateAt = -1f;
     }
 
     private static void Require(bool condition, string message)
@@ -172,9 +173,45 @@ internal static class TutorialChecks
                 Require(UnityEngine.Object.FindAnyObjectByType<ExitTrigger>().transform.position.y < -3f,
                     "automatic flip did not bring the exit down");
                 Capture("07-automatic-flip");
+                Keys(Key.Q); // Deliberately leave this first clone away from the button.
                 Next();
                 break;
             case 10:
+                var button = UnityEngine.Object.FindAnyObjectByType<PressureButtonSensor>();
+                SteerTo(button.transform.position.x);
+                if (!button.IsPressed) { plateAt = -1; return false; }
+                if (plateAt < 0)
+                {
+                    plateAt = Time.time;
+                    var misplaced = UnityEngine.Object.FindAnyObjectByType<ShadowCloneSpawner>().CurrentShadow;
+                    Require(misplaced != null, "the first Q press did not create the misplaced-clone fixture");
+                    var misplacedBody = misplaced.GetComponent<Rigidbody2D>();
+                    Vector2 away = new Vector2(button.transform.position.x + 3, -3.9f);
+                    misplaced.transform.position = away;
+                    misplacedBody.position = away;
+                    misplacedBody.linearVelocity = Vector2.zero;
+                    Physics2D.SyncTransforms();
+                }
+                Keys();
+                if (Time.time - plateAt < 1f) return false;
+                Require(hint.text.Contains("Stand on the orange button"),
+                    "a misplaced clone incorrectly completed the shadow lesson: " + hint.text);
+                Require(!UnityEngine.Object.FindAnyObjectByType<ButtonControlledWall>().GetComponent<Collider2D>().enabled,
+                    "standing on the pressure button did not open the gate");
+                Keys(Key.Q);
+                Next();
+                break;
+            case 11:
+                Keys();
+                if (Time.time - since < .5f) return false;
+                Require(UnityEngine.Object.FindAnyObjectByType<ShadowCloneSpawner>().CurrentShadow != null,
+                    "Q did not create a tutorial shadow");
+                Require(UnityEngine.Object.FindAnyObjectByType<PressureButtonSensor>().IsPressed,
+                    "shadow did not hold the tutorial button");
+                Capture("08-shadow-button");
+                Next();
+                break;
+            case 12:
                 if (!game.IsFinished)
                 {
                     SteerTo(UnityEngine.Object.FindAnyObjectByType<ExitTrigger>().transform.position.x);
@@ -182,11 +219,16 @@ internal static class TutorialChecks
                 }
                 Keys();
                 if (hint.transform.parent.gameObject.activeSelf) return false;
-                Capture("08-completed");
+                Require(PlayerProgress.IsTutorialCompleted && PlayerProgress.StartingLightCharges == 1,
+                    "finishing the tutorial did not save the first permanent starting charge");
+                Require(UnityEngine.Object.FindObjectsByType<TMP_Text>(FindObjectsSortMode.None)
+                    .Any(text => text.text.Contains("STARTING LIGHT UNLOCKED")),
+                    "tutorial completion did not show its permanent light reward");
+                Capture("09-completed");
                 game.RestartLevel();
                 Next();
                 break;
-            case 11:
+            case 13:
                 if (!game.IsPreviewing) return false;
                 Require(game.StarsCollected == 0 && game.ChargesRemaining == 0 &&
                     flip.CurrentPhase == MapFlipController.Phase.Idle && !flip.IsFlipped,

@@ -288,6 +288,18 @@ public class GameManager : MonoBehaviour
                         "<size=45%><color=#F2F2F5><b>IN THE DARK</b></color></size>\n" +
                         $"<b>{Mathf.CeilToInt(timeRemaining)}</b>";
                 }
+                else if (mapFlip != null && mapFlip.SectionRoots.Length > 0)
+                {
+                    // Keep both small maps unobscured; their gap holds the brief.
+                    Vector3 gap = (mapFlip.SectionRoots[0].position + mapFlip.SectionRoots[1].position) * .5f;
+                    Vector3 anchor = Camera.main.WorldToViewportPoint(gap);
+                    countdown.rectTransform.anchorMin = countdown.rectTransform.anchorMax = new Vector2(anchor.x, anchor.y);
+                    countdown.rectTransform.anchoredPosition = Vector2.zero;
+                    countdown.rectTransform.sizeDelta = new Vector2(1400, 100);
+                    countdown.fontSize = 42;
+                    countdown.text = $"<b>LINKED MAPS   {Mathf.CeilToInt(timeRemaining)}</b>\n" +
+                        "<size=70%>2 STARS BELOW · 3 ABOVE · RETURN TO LOWER EXIT</size>";
+                }
                 else countdown.text =
                     $"<size=40%>MEMORIZE</size>\n<b>{Mathf.CeilToInt(timeRemaining)}</b>";
             }
@@ -552,7 +564,9 @@ public class GameManager : MonoBehaviour
 
         LevelCompletionResult completion = default;
         int levelIndex = -1;
-        if (LevelCatalog.TryGetLevelIndex(levelName, out levelIndex))
+        if (IsTutorial)
+            completion = PlayerProgress.CompleteTutorial();
+        else if (LevelCatalog.TryGetLevelIndex(levelName, out levelIndex))
             completion = PlayerProgress.CompleteLevel(levelIndex);
 
         float runSeconds = RunSeconds;

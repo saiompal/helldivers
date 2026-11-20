@@ -9,8 +9,16 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private Transform target;
     [Tooltip("A sprite covering the whole map, used to keep the camera inside it.")]
     [SerializeField] private SpriteRenderer mapBounds;
+    [SerializeField] private SpriteRenderer[] sectionBounds = System.Array.Empty<SpriteRenderer>();
     [Tooltip("Optional. The camera locks onto the player while the map turns.")]
     [SerializeField] private MapFlipController mapFlip;
+
+    [Header("Level Overview")]
+    [Tooltip("Opt in for maps that need their overview fitted at runtime.")]
+    [SerializeField] private bool autoFitThisLevel;
+    [SerializeField, Min(0f)] private float overviewPadding = .35f;
+    [SerializeField, Range(0f, .4f)] private float minimumTopShare;
+    [SerializeField, Range(0f, .4f)] private float minimumBottomShare;
 
     [Header("Zoom")]
     [Tooltip("Orthographic size while following. Smaller shows less of the map.")]
@@ -37,6 +45,8 @@ public class CameraFollow : MonoBehaviour
     private Vector2 focus;
     private Vector2 focusVelocity;
     private bool fitCompletion;
+    private float TopShare => autoFitThisLevel ? Mathf.Max(topBarShare, minimumTopShare) : topBarShare;
+    private float BottomShare => autoFitThisLevel ? Mathf.Max(bottomBarShare, minimumBottomShare) : bottomBarShare;
     public bool IsOverviewSettled => targetBlend == 0f && blend <= .001f;
 
     private void Awake()
@@ -58,6 +68,14 @@ public class CameraFollow : MonoBehaviour
     public void FollowPlayer()
     {
         targetBlend = 1f;
+    }
+
+    public void SnapToPlayer()
+    {
+        if (target == null) return;
+        focus = target.position;
+        focusVelocity = Vector2.zero;
+        if (view != null && targetBlend > 0f) transform.position = PositionFor(focus, view.orthographicSize);
     }
 
     public void ShowOverview(float footerShare = 0f)
@@ -83,13 +101,14 @@ public class CameraFollow : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (fitCompletion && mapBounds != null)
+        if ((fitCompletion || autoFitThisLevel) && mapBounds != null)
         {
             Bounds bounds = mapBounds.bounds;
-            overviewSize = Mathf.Max((bounds.extents.y + .35f) / (1f - topBarShare - bottomBarShare),
-                (bounds.extents.x + .35f) / Mathf.Max(.1f, view.aspect));
+            float padding = autoFitThisLevel ? overviewPadding : .35f;
+            overviewSize = Mathf.Max((bounds.extents.y + padding) / Mathf.Max(.05f, 1f - TopShare - BottomShare),
+                (bounds.extents.x + padding) / Mathf.Max(.1f, view.aspect));
             overviewPosition = new Vector3(bounds.center.x,
-                bounds.center.y + overviewSize * (topBarShare - bottomBarShare), transform.position.z);
+                bounds.center.y + overviewSize * (TopShare - BottomShare), transform.position.z);
         }
         if (target == null)
         {
@@ -131,16 +150,29 @@ public class CameraFollow : MonoBehaviour
     private Vector3 PositionFor(Vector2 point, float size)
     {
         float halfWidth = size * view.aspect;
-        float halfHeight = size * (1f - topBarShare - bottomBarShare);
+        float halfHeight = size * (1f - TopShare - BottomShare);
 
         if (mapBounds != null)
         {
             Bounds map = mapBounds.bounds;
+            float nearest = float.PositiveInfinity;
+            foreach (SpriteRenderer section in sectionBounds)
+            {
+                if (section == null) continue;
+                if (mapFlip != null && mapFlip.SectionRoots.Length > 0 &&
+                    section.transform.IsChildOf(mapFlip.PlayerSection))
+                {
+                    map = section.bounds;
+                    break;
+                }
+                float distance = ((Vector2)section.bounds.center - point).sqrMagnitude;
+                if (distance < nearest) { nearest = distance; map = section.bounds; }
+            }
             point.x = ClampToRange(point.x, map.min.x + halfWidth, map.max.x - halfWidth);
             point.y = ClampToRange(point.y, map.min.y + halfHeight, map.max.y - halfHeight);
         }
 
-        float offsetY = size * (topBarShare - bottomBarShare);
+        float offsetY = size * (TopShare - BottomShare);
         return new Vector3(point.x, point.y + offsetY, transform.position.z);
     }
 

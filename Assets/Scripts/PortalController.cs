@@ -36,6 +36,10 @@ public class PortalController : MonoBehaviour
         Transform player = body != null ? body.transform : other.transform;
         if (!player.CompareTag("Player") || destination == null || arrivingColliders.Contains(other))
             return;
+        if (GameManager.Instance != null && !GameManager.Instance.CanPlayerMove) return;
+
+        RunTrajectory trajectory = GameManager.Instance != null ? GameManager.Instance.GetComponent<RunTrajectory>() : null;
+        trajectory?.MarkWaypoint();
 
         PortalController arrivalPortal = destination.GetComponentInParent<PortalController>();
         if (arrivalPortal != null)
@@ -44,9 +48,11 @@ public class PortalController : MonoBehaviour
                 arrivalPortal.arrivingColliders.Add(playerCollider);
         }
 
-        if (body != null)
-            body.position = destination.position;
-        else
-            player.position = destination.position;
+        player.position = destination.position;
+        if (body != null) body.position = destination.position;
+        if (body != null) body.linearVelocity = Vector2.zero;
+        Physics2D.SyncTransforms();
+        trajectory?.MarkWaypoint();
+        Camera.main?.GetComponent<CameraFollow>()?.SnapToPlayer();
     }
 }

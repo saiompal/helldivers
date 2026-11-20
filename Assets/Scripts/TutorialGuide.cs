@@ -5,7 +5,7 @@ using UnityEngine;
 // automatic flip cycle independently of how quickly the hints are read.
 public class TutorialGuide : MonoBehaviour
 {
-    private enum Step { Intro, Move, Jump, Star, Light, Flip, Exit, Done }
+    private enum Step { Intro, Move, Jump, Star, Light, Flip, Shadow, Gate, Exit, Done }
 
     [SerializeField, Min(0f)] private float firstStarFlipDelay = 5f;
 
@@ -21,6 +21,11 @@ public class TutorialGuide : MonoBehaviour
     private float firstStarAt = -1f;
     private int revealsAtFirstStar;
     private bool hasJumped, flipTimerStarted;
+    private PressureButtonSensor shadowButton;
+    private ShadowCloneSpawner shadowSpawner;
+    private bool ShadowHoldsButton => shadowSpawner != null && shadowSpawner.CurrentShadow != null &&
+        shadowButton != null && shadowButton.IsPressed && shadowButton.GetComponent<Collider2D>().IsTouching(
+            shadowSpawner.CurrentShadow.GetComponent<Collider2D>());
     private Vector2 layoutScreen;
     private float layoutScale;
 
@@ -37,6 +42,8 @@ public class TutorialGuide : MonoBehaviour
         }
 
         player = movement.GetComponent<Rigidbody2D>();
+        shadowButton = FindAnyObjectByType<PressureButtonSensor>();
+        shadowSpawner = movement.GetComponent<ShadowCloneSpawner>();
         startX = player.position.x;
         movement.Jumped += OnJumped;
         canvas = canvas.rootCanvas;
@@ -98,7 +105,19 @@ public class TutorialGuide : MonoBehaviour
                     SetStep(Step.Flip);
                 break;
             case Step.Flip:
-                if (mapFlip.FlipCount > 0 && hintAge >= 2f) SetStep(Step.Exit);
+                if (mapFlip.FlipCount > 0 && !mapFlip.IsTurning && hintAge >= 2f)
+                {
+                    // Keep the practice button on the floor while teaching clones.
+                    mapFlip.Stop();
+                    SetStep(Step.Shadow);
+                }
+                break;
+            case Step.Shadow:
+                if (ShadowHoldsButton && hintAge >= 1f) SetStep(Step.Gate);
+                break;
+            case Step.Gate:
+                if (player.position.x < -7f) SetStep(Step.Exit);
+                else if (!ShadowHoldsButton && hintAge >= .5f) SetStep(Step.Shadow);
                 break;
         }
     }
@@ -116,7 +135,7 @@ public class TutorialGuide : MonoBehaviour
         heading.enabled = label.enabled = next != Step.Intro;
 
         bool mobile = DeviceVisibility.IsMobileDevice;
-        heading.text = $"TUTORIAL   {(int)next + 1} / 7";
+        heading.text = $"TUTORIAL   {(int)next + 1} / 9";
         label.text = next switch
         {
             Step.Intro => "Memorize the map. Soon, you'll be...\n<size=140%><b>IN THE DARK</b></size>",
@@ -127,7 +146,13 @@ public class TutorialGuide : MonoBehaviour
                 ? "Stars give you light charges.\nTap <b>LIGHT</b> to briefly reveal the map."
                 : "Stars give you light charges.\nPress <b>F</b> to briefly reveal the map.",
             Step.Flip => "Watch the <color=#FF5A4F>hourglass</color>. Your light flashes red\nbefore the map flips.",
-            Step.Exit => "The map flips on its own,\nbringing new places within reach.",
+            Step.Shadow => mobile
+                ? "The map flips on its own, bringing new places within reach.\nStand on the orange button, then tap <b>CLONE</b>."
+                : "The map flips on its own, bringing new places within reach.\nStand on the orange button, then press <b>Q</b> to leave a shadow.",
+            Step.Gate => "Your shadow holds the button down.\nLeave it there and walk left through the orange wall.",
+            Step.Exit => PlayerProgress.IsTutorialCompleted
+                ? "You made it through!\nReach the exit to finish the tutorial."
+                : "Reach the exit to finish the tutorial.\nReward: +1 permanent starting light.",
             _ => string.Empty
         };
         movementKeys.gameObject.SetActive(next == Step.Move && !mobile);

@@ -59,6 +59,7 @@ public static class TutorialBuilder
         {
             manager.gameObject.AddComponent<TutorialGuide>();
         }
+        CampaignBuilder.AddShadowLesson(manager.gameObject.scene);
 
         EditorSceneManager.MarkSceneDirty(manager.gameObject.scene);
         EditorSceneManager.SaveScene(manager.gameObject.scene);

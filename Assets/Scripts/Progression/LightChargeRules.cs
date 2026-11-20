@@ -9,7 +9,7 @@ public static class LightChargeRules
         return Math.Min(charges, PlayerProgress.MaxStoredStartingCharges);
     }
 
-    // The five-charge limit applies only to permanent starting allowance.
+    // The three-charge limit applies only to permanent starting allowance.
     // Star rewards are live run currency and intentionally have no gameplay cap.
     public static int AddStarReward(int currentCharges)
     {

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // One attempt, in maze coordinates. The line stays invisible until a win.
@@ -20,19 +21,34 @@ public sealed class RunTrajectory : MonoBehaviour
     private bool recording;
     private float nextSample;
     private Coroutine reveal;
+    private readonly List<RunTrajectory> sectionTrails = new List<RunTrajectory>();
+    private bool restrictToSection, revealComplete;
 
-    public int SampleCount => samples.Count;
+    public int SampleCount => samples.Count + sectionTrails.Sum(trail => trail.SampleCount);
     public bool IsRecording => recording;
-    public bool IsVisible => line != null && line.enabled;
-    public bool RevealComplete { get; private set; }
+    public bool IsVisible => (line != null && line.enabled) || sectionTrails.Any(trail => trail.IsVisible);
+    public bool RevealComplete => sectionTrails.Count > 0 ? sectionTrails.All(trail => trail.RevealComplete) : revealComplete;
 
-    public bool Configure(Transform ball, Transform map, MapFlipController controller, CameraFollow cameraFollow)
+    public bool Configure(Transform ball, Transform map, MapFlipController controller, CameraFollow cameraFollow, bool sectionOnly = false)
     {
         player = ball; maze = map; flip = controller; overview = cameraFollow;
+        restrictToSection = sectionOnly;
         if (player == null || maze == null)
         {
             Debug.LogWarning("Trajectory needs a player and maze; level completion remains available.", this);
             return false;
+        }
+        if (!sectionOnly && controller != null && controller.SectionRoots.Length > 0)
+        {
+            foreach (Transform section in controller.SectionRoots)
+            {
+                var child = new GameObject("Route recorder - " + section.name);
+                child.transform.SetParent(transform, false);
+                var trail = child.AddComponent<RunTrajectory>();
+                if (!trail.Configure(ball, section, controller, cameraFollow, true)) return false;
+                sectionTrails.Add(trail);
+            }
+            return true;
         }
         var shader = Resources.Load<Shader>("TrajectoryLine");
         if (shader == null || !shader.isSupported)
@@ -61,6 +77,12 @@ public sealed class RunTrajectory : MonoBehaviour
     public void BeginRecording()
     {
         Clear();
+        if (sectionTrails.Count > 0)
+        {
+            foreach (var trail in sectionTrails) trail.BeginRecording();
+            recording = true;
+            return;
+        }
         if (line == null) return;
         recording = true;
         CapturePosition();
@@ -69,6 +91,7 @@ public sealed class RunTrajectory : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (sectionTrails.Count > 0) return;
         if (recording && Time.time >= nextSample)
         {
             nextSample = Time.time + SampleSeconds;
@@ -85,6 +108,7 @@ public sealed class RunTrajectory : MonoBehaviour
     private void CapturePosition()
     {
         if (player == null || maze == null) return;
+        if (restrictToSection && flip.GetSectionAt(player.position) != maze) return;
         Vector3 point = maze.InverseTransformPoint(player.position);
         point.z = 0;
         if (samples.Count == 0 || (point - samples[samples.Count - 1]).sqrMagnitude > .000001f)
@@ -94,6 +118,11 @@ public sealed class RunTrajectory : MonoBehaviour
     public void MarkWaypoint()
     {
         if (!recording) return;
+        if (sectionTrails.Count > 0)
+        {
+            foreach (var trail in sectionTrails) trail.MarkWaypoint();
+            return;
+        }
         CapturePosition();
         int index = samples.Count - 1;
         if (index >= 0 && (waypoints.Count == 0 || waypoints[waypoints.Count - 1] != index)) waypoints.Add(index);
@@ -130,11 +159,17 @@ public sealed class RunTrajectory : MonoBehaviour
     public void ShowCompletedRoute()
     {
         if (!recording) return;
+        if (sectionTrails.Count > 0)
+        {
+            foreach (var trail in sectionTrails) trail.ShowCompletedRoute();
+            recording = false;
+            return;
+        }
         CapturePosition();
         recording = false;
-        if (samples.Count < 2) { RevealComplete = true; return; }
+        if (samples.Count < 2) { revealComplete = true; return; }
         var points = BuildPath();
-        if (points.Count < 2) { RevealComplete = true; return; }
+        if (points.Count < 2) { revealComplete = true; return; }
         reveal = StartCoroutine(Reveal(points));
     }
 
@@ -162,15 +197,16 @@ public sealed class RunTrajectory : MonoBehaviour
         }
         line.positionCount = points.Count;
         line.SetPositions(points.ToArray());
-        RevealComplete = true;
+        revealComplete = true;
         reveal = null;
     }
 
     public void Clear()
     {
         recording = false;
+        foreach (var trail in sectionTrails) trail.Clear();
         if (reveal != null) { StopCoroutine(reveal); reveal = null; }
-        samples.Clear(); waypoints.Clear(); walls.Clear(); hits.Clear(); RevealComplete = false;
+        samples.Clear(); waypoints.Clear(); walls.Clear(); hits.Clear(); revealComplete = false;
         if (line != null) { line.enabled = false; line.positionCount = 0; }
     }
 

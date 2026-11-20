@@ -4,10 +4,10 @@ public static class LevelCatalog
 {
     private static readonly string[] SceneNames =
     {
-        "Level0", "Level1", "Level2", "Level3", "Level4",
+        "Level0", "ShadowLevel", "Level2", "LinkedMaps", "Level4", "ShadowLevel 2",
     };
 
-    public const int Count = 5;
+    public static int Count => SceneNames.Length;
 
     public static string GetSceneName(int levelIndex)
     {
@@ -19,7 +19,7 @@ public static class LevelCatalog
     public static int GetDisplayNumber(int levelIndex) => levelIndex + 1;
 
     public static bool IsChargeMilestone(int levelIndex) =>
-        levelIndex == 0 || levelIndex == 2 || levelIndex == 4;
+        levelIndex == 0 || levelIndex == 2;
 
     public static bool TryGetLevelIndex(string sceneName, out int levelIndex)
     {

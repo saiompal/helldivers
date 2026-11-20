@@ -20,6 +20,8 @@ public class MapFlipController : MonoBehaviour
     [Header("Scene References")]
     [Tooltip("Parent of everything that flips: floor, walls, stars and exit.")]
     [SerializeField] private Transform mapRoot;
+    [Tooltip("Optional independently rotating sections, used by the linked-map level.")]
+    [SerializeField] private Transform[] sectionRoots = Array.Empty<Transform>();
     [SerializeField] private Rigidbody2D player;
     [Tooltip("Optional. Pulses this light during the warning.")]
     [SerializeField] private Light2D visionLight;
@@ -38,6 +40,20 @@ public class MapFlipController : MonoBehaviour
     public bool IsFlipped { get; private set; }
     public int FlipCount { get; private set; }
     public Transform MapRoot => mapRoot;
+    public Transform[] SectionRoots => sectionRoots;
+    public Transform PlayerSection => IsTurning ? turnSection : GetSectionAt(player.position);
+    public Transform GetSectionAt(Vector3 position)
+    {
+        Transform nearest = mapRoot;
+        float distance = float.PositiveInfinity;
+        foreach (Transform section in sectionRoots)
+        {
+            if (section == null) continue;
+            float next = (position - section.position).sqrMagnitude;
+            if (next < distance) { nearest = section; distance = next; }
+        }
+        return nearest;
+    }
     public Transform PlayerTransform => player != null ? player.transform : null;
 
     public float CycleDuration => secondsBetweenFlips + warningSeconds;
@@ -61,9 +77,14 @@ public class MapFlipController : MonoBehaviour
     };
 
     public event Action Flipped;
+    public event Action TurnStarted;
+    public event Action<Vector3, Quaternion> TurnPoseApplied;
+    public event Action TurnFinished;
 
     private Vector3 pivot;
     private Quaternion turnStartRotation;
+    private Quaternion[] sectionStartRotations;
+    private Transform turnSection;
     private Vector2 turnStartPosition;
     private RigidbodyInterpolation2D normalInterpolation;
     private Color visionColor;
@@ -190,9 +211,14 @@ public class MapFlipController : MonoBehaviour
         player.interpolation = RigidbodyInterpolation2D.None;
 
         turnStartPosition = player.position;
+        turnSection = GetSectionAt(player.position);
+        pivot = turnSection.position;
         turnStartRotation = mapRoot.rotation;
+        sectionStartRotations = new Quaternion[sectionRoots.Length];
+        for (int i = 0; i < sectionRoots.Length; i++) sectionStartRotations[i] = sectionRoots[i].rotation;
         CurrentPhase = Phase.Turning;
         elapsed = 0f;
+        TurnStarted?.Invoke();
     }
 
     private void AnimateTurn()
@@ -210,7 +236,9 @@ public class MapFlipController : MonoBehaviour
     private void ApplyTurn(float progress)
     {
         Quaternion delta = Quaternion.Euler(0f, 0f, 180f * progress);
-        mapRoot.rotation = delta * turnStartRotation;
+        if (sectionRoots.Length == 0) mapRoot.rotation = delta * turnStartRotation;
+        else for (int i = 0; i < sectionRoots.Length; i++)
+            sectionRoots[i].rotation = delta * sectionStartRotations[i];
 
         // The player moves with the maze but stays upright.
         Vector3 offset = (Vector3)turnStartPosition - pivot;
@@ -219,6 +247,7 @@ public class MapFlipController : MonoBehaviour
         player.transform.position = new Vector3(
             position.x, position.y, player.transform.position.z
         );
+        TurnPoseApplied?.Invoke(pivot, delta);
     }
 
     private void FinishTurn()
@@ -226,12 +255,17 @@ public class MapFlipController : MonoBehaviour
         IsFlipped = !IsFlipped;
 
         // Snap to an exact half turn so rounding never builds up.
-        mapRoot.rotation = Quaternion.Euler(0f, 0f, IsFlipped ? 180f : 0f);
+        Quaternion endRotation = Quaternion.Euler(0f, 0f, IsFlipped ? 180f : 0f);
+        if (sectionRoots.Length == 0) mapRoot.rotation = endRotation;
+        else foreach (Transform section in sectionRoots) section.rotation = endRotation;
         Vector2 end = 2f * (Vector2)pivot - turnStartPosition;
         player.transform.position = new Vector3(end.x, end.y, player.transform.position.z);
         player.position = end;
         player.simulated = true;
         player.interpolation = normalInterpolation;
+        // Carry shadow clones to the exact endpoint before resuming physics.
+        TurnPoseApplied?.Invoke(pivot, Quaternion.Euler(0f, 0f, 180f));
+        TurnFinished?.Invoke();
         Physics2D.SyncTransforms();
 
         FlipCount++;

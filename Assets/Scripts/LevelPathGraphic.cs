@@ -6,7 +6,10 @@ public class LevelPathGraphic : MaskableGraphic
 {
     public static readonly Vector2 StartAnchor = new Vector2(.09f, .725f);
     public static readonly Vector2 FinishAnchor = new Vector2(.92f, .245f);
-    public static readonly Vector2[] NodeAnchors = { new Vector2(.34f, .745f), new Vector2(.76f, .66f), new Vector2(.32f, .485f), new Vector2(.735f, .42f), new Vector2(.50f, .27f) };
+    public static readonly Vector2[] NodeAnchors = {
+        new Vector2(.34f, .745f), new Vector2(.76f, .66f), new Vector2(.32f, .485f),
+        new Vector2(.735f, .42f), new Vector2(.50f, .27f), new Vector2(.7592f, .21708f),
+    };
     protected override void OnPopulateMesh(VertexHelper vh)
     {
         vh.Clear();
@@ -17,7 +20,10 @@ public class LevelPathGraphic : MaskableGraphic
         Curve(vh, NodeAnchors[2], new Vector2(.44f, .37f), new Vector2(.58f, .46f), NodeAnchors[3]);
         Curve(vh, NodeAnchors[3], new Vector2(1.0f, .43f), new Vector2(.93f, .30f), new Vector2(.72f, .30f));
         Curve(vh, new Vector2(.72f, .30f), new Vector2(.61f, .30f), new Vector2(.57f, .29f), NodeAnchors[4]);
-        Curve(vh, NodeAnchors[4], new Vector2(.65f, .18f), new Vector2(.79f, .22f), FinishAnchor);
+        // Split the original final curve at t=.6 to add level 6 without
+        // changing the original flowing path or the first five positions.
+        Curve(vh, NodeAnchors[4], new Vector2(.59f, .216f), new Vector2(.6764f, .2088f), NodeAnchors[5]);
+        Curve(vh, NodeAnchors[5], new Vector2(.8144f, .2226f), new Vector2(.868f, .235f), FinishAnchor);
     }
     private void Curve(VertexHelper vh, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
     {

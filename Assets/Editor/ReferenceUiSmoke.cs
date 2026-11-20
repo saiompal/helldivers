@@ -151,7 +151,7 @@ public static class ReferenceUiSmoke
                     game.RestartLevel(); stage = 5; stageTime = now; break;
                 case 5:
                     if (game == null || !game.IsPlaying) return;
-                    Require(game.StarsCollected == 0 && game.ChargesRemaining == 1, "Replay did not reset HUD using saved starting charges");
+                    Require(game.StarsCollected == 0 && game.ChargesRemaining == 2, "Replay did not reset HUD using tutorial + level 1 starting charges");
                     Require(!game.GetComponent<RunTrajectory>().IsVisible, "Replay leaked the previous trajectory");
                     game.FailLevel("Trajectory failure check");
                     Require(!game.GetComponent<RunTrajectory>().IsVisible && !game.GetComponent<RunTrajectory>().IsRecording,
@@ -166,15 +166,16 @@ public static class ReferenceUiSmoke
                     Require(completedStar.FindProperty("fill").colorValue == GameUi.Gold, "Completed level should have a filled yellow star");
                     Require(incompleteStar.FindProperty("fill").colorValue.a == 0, "Uncompleted level should have an outlined star");
                     ReferenceUiReview.Capture("level-map-completed");
-                    SceneManager.LoadScene("Level1"); Next(); break;
+                    SceneManager.LoadScene(LevelCatalog.GetSceneName(1)); Next(); break;
                 case 7:
                 case 8:
                 case 9:
                 case 10:
+                case 11:
                     if (game == null) return;
                     ValidateHud();
                     Require(game.GetComponent<RunTrajectory>() != null, "A level is missing trajectory tracking");
-                    if (stage < 10) { SceneManager.LoadScene("Level" + (stage - 5)); Next(); }
+                    if (stage < 11) { SceneManager.LoadScene(LevelCatalog.GetSceneName(stage - 5)); Next(); }
                     else Finish();
                     break;
             }
@@ -220,10 +221,10 @@ public static class ReferenceUiSmoke
     {
         PlayerProgress.ResetLocalProgress(); PlayerProgress.UseTestStorage(false);
         SessionState.SetBool(Running, false);
-        File.WriteAllText("UIReview/play-smoke.txt", "PASS: maze-local recording across repeated flips, stationary deduplication, pathway filtering of jumps/local loops, wall-safe shortcutting, preserved pickup detours and exact endpoints, hidden recording during play/reveals, animated win reveal, replay/failure cleanup, completion overview at 16:9/4:3/9:16, menu popup/navigation, single completion stars, light reveal/rewards, red flip animation, original world art and all five HUDs. Completion images use a scripted render fixture.\n");
+        File.WriteAllText("UIReview/play-smoke.txt", "PASS: maze-local recording across repeated flips, stationary deduplication, pathway filtering of jumps/local loops, wall-safe shortcutting, preserved pickup detours and exact endpoints, hidden recording during play/reveals, animated win reveal, replay/failure cleanup, completion overview at 16:9/4:3/9:16, menu popup/navigation, single completion stars, light reveal/rewards, red flip animation, original world art and all six level HUDs. Completion images use a scripted render fixture.\n");
         Debug.Log("REFERENCE_UI_PLAY_SMOKE_SUCCESS");
         File.WriteAllText("UIReview/tutorial-rework-result.txt",
-            "PASS: 10-second tutorial preview; real movement and jump; physical star pickup and light reward; F reveal; five-second grace period; automatic countdown, warning and flip; reachable exit; completion and replay; existing menu and all five level HUD checks.\n");
+            "PASS: 10-second tutorial preview; real movement and jump; physical star pickup and light reward; F reveal; five-second grace period; automatic countdown, warning and flip; Q shadow creation; pressure button and gate passage; reachable exit; completion and replay; six-level menu and HUD checks.\n");
         if (SessionState.GetBool(BuildAfterRun, false)) EditorApplication.ExitPlaymode();
         else EditorApplication.Exit(0);
     }
