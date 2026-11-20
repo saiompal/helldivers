@@ -4,86 +4,43 @@ using UnityEngine;
 // During play it remains locked and dim red until every star is collected.
 public class ExitTrigger : MonoBehaviour
 {
-    [SerializeField] private Color lockedColor = new Color(0.45f, 0.12f, 0.1f);
-    [SerializeField] private Color lockedGlowColor = new Color(1f, 0.3f, 0.25f);
-    [SerializeField] private Color previewColor = new Color(1f, 0.04f, 0.03f);
-    [SerializeField] private Color previewGlowColor = new Color(1f, 0.08f, 0.03f);
+    [SerializeField] private Sprite lockedDoor;
+    [SerializeField] private Sprite unlockedDoor;
+    [SerializeField] private UnityEngine.Rendering.Universal.Light2D unlockedLight;
 
     private SpriteRenderer spriteRenderer;
     private PulsingGlow glow;
-    private Color unlockedColor;
-    private Color unlockedGlowColor;
+    private GameManager manager;
     private bool wasPreviewing;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         glow = GetComponent<PulsingGlow>();
-
-        if (spriteRenderer != null)
-        {
-            unlockedColor = spriteRenderer.color;
-        }
-
-        if (glow != null)
-        {
-            unlockedGlowColor = glow.GlowColor;
-        }
     }
 
     private void Start()
     {
-        GameManager manager = GameManager.Instance;
+        manager = GameManager.Instance;
 
-        if (manager == null || manager.IsExitUnlocked)
+        if (manager == null)
         {
             return;
         }
 
-        ShowLocked(true);
         manager.ExitUnlocked += OnExitUnlocked;
+        RefreshDoor();
     }
 
     private void Update()
     {
-        GameManager manager = GameManager.Instance;
-        if (manager == null)
-            return;
-
-        if (manager.IsPreviewing)
-        {
-            wasPreviewing = true;
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.enabled = true;
-                spriteRenderer.color = previewColor;
-            }
-            if (glow != null)
-                glow.GlowColor = previewGlowColor;
-        }
-        else if (wasPreviewing)
-        {
-            wasPreviewing = false;
-            ShowLocked(!manager.IsExitUnlocked);
-        }
+        if (manager != null && wasPreviewing != manager.IsPreviewing)
+            RefreshDoor();
     }
 
     private void OnExitUnlocked()
     {
-        ShowLocked(false);
-    }
-
-    private void ShowLocked(bool locked)
-    {
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.color = locked ? lockedColor : unlockedColor;
-        }
-
-        if (glow != null)
-        {
-            glow.GlowColor = locked ? lockedGlowColor : unlockedGlowColor;
-        }
+        RefreshDoor();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -99,6 +56,28 @@ public class ExitTrigger : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.ExitUnlocked -= OnExitUnlocked;
+        }
+    }
+    private void RefreshDoor()
+    {
+        wasPreviewing = manager.IsPreviewing;
+        bool showOpenDoor = manager.IsExitUnlocked && !wasPreviewing;
+
+        if (spriteRenderer != null)
+        {
+            Sprite doorSprite = showOpenDoor ? unlockedDoor : lockedDoor;
+            if (doorSprite != null)
+                spriteRenderer.sprite = doorSprite;
+
+            spriteRenderer.color = Color.white;
+
+            if (wasPreviewing)
+                spriteRenderer.enabled = true;
+        }
+
+        if (unlockedLight != null)
+        {
+            unlockedLight.enabled = showOpenDoor;
         }
     }
 }

@@ -1,0 +1,317 @@
+fileFormatVersion: 2
+guid: 9e6a3b97fb7c0844ab3d94a539e37794
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5648916587612448851
+    second: Exploded cyberpunk border sprite sheet_0
+  - first:
+      213: 7001742992499724691
+    second: Exploded cyberpunk border sprite sheet_1
+  - first:
+      213: -6112416667223415142
+    second: Exploded cyberpunk border sprite sheet_2
+  - first:
+      213: -7411979160497567183
+    second: Exploded cyberpunk border sprite sheet_3
+  - first:
+      213: -11288246557866598
+    second: Exploded cyberpunk border sprite sheet_4
+  - first:
+      213: -8723866111267830364
+    second: Exploded cyberpunk border sprite sheet_5
+  - first:
+      213: 7783295534224844798
+    second: Exploded cyberpunk border sprite sheet_6
+  - first:
+      213: -8847067206104473073
+    second: Exploded cyberpunk border sprite sheet_7
+  - first:
+      213: -4711165322201992842
+    second: Exploded cyberpunk border sprite sheet_8
+  - first:
+      213: 2566648596663077054
+    second: Exploded cyberpunk border sprite sheet_9
+  - first:
+      213: 8860126195388136883
+    second: Exploded cyberpunk border sprite sheet_10
+  - first:
+      213: 771326257009015859
+    second: Exploded cyberpunk border sprite sheet_11
+  - first:
+      213: -6599119703087094061
+    second: Exploded cyberpunk border sprite sheet_12
+  - first:
+      213: -1717027859311701714
+    second: Exploded cyberpunk border sprite sheet_13
+  - first:
+      213: 8195075745866374393
+    second: Exploded cyberpunk border sprite sheet_14
+  - first:
+      213: 7080682579542826
+    second: Exploded cyberpunk border sprite sheet_15
+  - first:
+      213: 3601725354957358748
+    second: Exploded cyberpunk border sprite sheet_16
+  - first:
+      213: -7120212553374210923
+    second: Exploded cyberpunk border sprite sheet_17
+  - first:
+      213: -6148801363249330260
+    second: Exploded cyberpunk border sprite sheet_18
+  - first:
+      213: 2371860722873332856
+    second: Exploded cyberpunk border sprite sheet_19
+  - first:
+      213: 5773045858146426100
+    second: Exploded cyberpunk border sprite sheet_20
+  - first:
+      213: 8247739172490001410
+    second: Exploded cyberpunk border sprite sheet_21
+  - first:
+      213: 2088311438120339271
+    second: Exploded cyberpunk border sprite sheet_22
+  - first:
+      213: -9034740029400982323
+    second: Exploded cyberpunk border sprite sheet_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Top
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 796
+        width: 1552
+        height: 103
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da75c85fa440b91b0800000000000000
+      internalID: -5648916587612448851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Left
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 197
+        width: 102
+        height: 543
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 391d684a7203b2160800000000000000
+      internalID: 7001742992499724691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Right
+      rect:
+        serializedVersion: 2
+        x: 1507
+        y: 197
+        width: 102
+        height: 542
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20c3758341bd57270800000000000000
+      internalID: 8247739172490001410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bottom
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 40
+        width: 1554
+        height: 103
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff4d455c269d13d4582819e6957f7f93
+      internalID: 2088311438120339271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: b4f3e6a5713cbe24d989f3af96ec1994
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":1,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      Bottom: 2088311438120339271
+      Exploded cyberpunk border sprite sheet_1: -1210677155
+      Exploded cyberpunk border sprite sheet_10: 8860126195388136883
+      Exploded cyberpunk border sprite sheet_11: 771326257009015859
+      Exploded cyberpunk border sprite sheet_12: -6599119703087094061
+      Exploded cyberpunk border sprite sheet_13: -1717027859311701714
+      Exploded cyberpunk border sprite sheet_14: 8195075745866374393
+      Exploded cyberpunk border sprite sheet_15: 7080682579542826
+      Exploded cyberpunk border sprite sheet_16: 3601725354957358748
+      Exploded cyberpunk border sprite sheet_17: -7120212553374210923
+      Exploded cyberpunk border sprite sheet_18: -6148801363249330260
+      Exploded cyberpunk border sprite sheet_19: 2371860722873332856
+      Exploded cyberpunk border sprite sheet_2: -6112416667223415142
+      Exploded cyberpunk border sprite sheet_20: 5773045858146426100
+      Exploded cyberpunk border sprite sheet_23: -9034740029400982323
+      Exploded cyberpunk border sprite sheet_3: -7411979160497567183
+      Exploded cyberpunk border sprite sheet_4: -11288246557866598
+      Exploded cyberpunk border sprite sheet_5: -8723866111267830364
+      Exploded cyberpunk border sprite sheet_6: 7783295534224844798
+      Exploded cyberpunk border sprite sheet_7: -8847067206104473073
+      Exploded cyberpunk border sprite sheet_8: -4711165322201992842
+      Exploded cyberpunk border sprite sheet_9: 2566648596663077054
+      Left: 7001742992499724691
+      Right: 8247739172490001410
+      Top: -5648916587612448851
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

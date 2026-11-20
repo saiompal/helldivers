@@ -1,0 +1,242 @@
+fileFormatVersion: 2
+guid: b698f9f3d6787c5478012eda98835c99
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8640025637553232049
+    second: Twin icy cyan platform beams_0
+  - first:
+      213: 8497444598053604766
+    second: Twin icy cyan platform beams_1
+  - first:
+      213: -554952798875483139
+    second: Twin icy cyan platform beams_2
+  - first:
+      213: 2588436883470433969
+    second: Twin icy cyan platform beams_3
+  - first:
+      213: -234447904863787948
+    second: Twin icy cyan platform beams_4
+  - first:
+      213: 1883766280735323353
+    second: Twin icy cyan platform beams_5
+  - first:
+      213: -8679784369952851825
+    second: Twin icy cyan platform beams_6
+  - first:
+      213: -951776444744054922
+    second: Twin icy cyan platform beams_7
+  - first:
+      213: -9042944950704893227
+    second: Twin icy cyan platform beams_8
+  - first:
+      213: -1813427810408906603
+    second: Twin icy cyan platform beams_9
+  - first:
+      213: 5097465350671633731
+    second: Twin icy cyan platform beams_10
+  - first:
+      213: 616856210376994521
+    second: Twin icy cyan platform beams_11
+  - first:
+      213: -677144362698822724
+    second: Twin icy cyan platform beams_12
+  - first:
+      213: 3127698484734419115
+    second: Twin icy cyan platform beams_13
+  - first:
+      213: -5590570401855487004
+    second: Twin icy cyan platform beams_14
+  - first:
+      213: -275565686547098718
+    second: Twin icy cyan platform beams_15
+  - first:
+      213: 2388122782723403590
+    second: Twin icy cyan platform beams_16
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Horizontal
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 628
+        width: 1231
+        height: 198
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b8d0a06a8987e770800000000000000
+      internalID: 8640025637553232049
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Vertical
+      rect:
+        serializedVersion: 2
+        x: 1510
+        y: 46
+        width: 187
+        height: 809
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64fee30a401542120800000000000000
+      internalID: 2388122782723403590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 8a3b6ec139fa0594fbc9daeac12f5b4e
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Horizontal: 8640025637553232049
+      Twin icy cyan platform beams_1: 8497444598053604766
+      Twin icy cyan platform beams_10: 5097465350671633731
+      Twin icy cyan platform beams_11: 616856210376994521
+      Twin icy cyan platform beams_12: -677144362698822724
+      Twin icy cyan platform beams_13: 3127698484734419115
+      Twin icy cyan platform beams_14: -5590570401855487004
+      Twin icy cyan platform beams_15: -275565686547098718
+      Twin icy cyan platform beams_2: -554952798875483139
+      Twin icy cyan platform beams_3: 2588436883470433969
+      Twin icy cyan platform beams_4: -234447904863787948
+      Twin icy cyan platform beams_5: 1883766280735323353
+      Twin icy cyan platform beams_6: -8679784369952851825
+      Twin icy cyan platform beams_7: -951776444744054922
+      Twin icy cyan platform beams_8: -9042944950704893227
+      Twin icy cyan platform beams_9: -1813427810408906603
+      Vertical: 2388122782723403590
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

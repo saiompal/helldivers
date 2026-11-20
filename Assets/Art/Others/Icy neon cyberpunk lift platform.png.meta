@@ -1,0 +1,598 @@
+fileFormatVersion: 2
+guid: 5885e9aa1dfad1f4f8113b969e734c99
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5671958950546608477
+    second: Icy neon cyberpunk lift platform_0
+  - first:
+      213: 975305997000116770
+    second: Icy neon cyberpunk lift platform_1
+  - first:
+      213: 187648231191255170
+    second: Icy neon cyberpunk lift platform_2
+  - first:
+      213: 8172357467238757217
+    second: Icy neon cyberpunk lift platform_3
+  - first:
+      213: 2698311072587997677
+    second: Icy neon cyberpunk lift platform_4
+  - first:
+      213: 5980239625488476855
+    second: Icy neon cyberpunk lift platform_5
+  - first:
+      213: 4808178442162560627
+    second: Icy neon cyberpunk lift platform_6
+  - first:
+      213: 768989875251323367
+    second: Icy neon cyberpunk lift platform_7
+  - first:
+      213: 7726098966073002309
+    second: Icy neon cyberpunk lift platform_8
+  - first:
+      213: -1243033129853548152
+    second: Icy neon cyberpunk lift platform_9
+  - first:
+      213: -1922055557887495907
+    second: Icy neon cyberpunk lift platform_10
+  - first:
+      213: 7939038394411982137
+    second: Icy neon cyberpunk lift platform_11
+  - first:
+      213: -4609374966546150279
+    second: Icy neon cyberpunk lift platform_12
+  - first:
+      213: 906543819101770946
+    second: Icy neon cyberpunk lift platform_13
+  - first:
+      213: 194117403931739585
+    second: Icy neon cyberpunk lift platform_14
+  - first:
+      213: 8569718767585155145
+    second: Icy neon cyberpunk lift platform_15
+  - first:
+      213: -8192416071426807940
+    second: Icy neon cyberpunk lift platform_16
+  - first:
+      213: 7078174902613065272
+    second: Icy neon cyberpunk lift platform_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 300
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_0
+      rect:
+        serializedVersion: 2
+        x: 46
+        y: 0
+        width: 2087
+        height: 638
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d519deb3d98d6be40800000000000000
+      internalID: 5671958950546608477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_1
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 623
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22a008a03abf88d00800000000000000
+      internalID: 975305997000116770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_2
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 618
+        width: 37
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28892e27219aa9200800000000000000
+      internalID: 187648231191255170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_3
+      rect:
+        serializedVersion: 2
+        x: 281
+        y: 626
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 163f64441db0a6170800000000000000
+      internalID: 8172357467238757217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_4
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 630
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de16c1fcf93527520800000000000000
+      internalID: 2698311072587997677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_5
+      rect:
+        serializedVersion: 2
+        x: 770
+        y: 626
+        width: 116
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7baa4f431441ef250800000000000000
+      internalID: 5980239625488476855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_6
+      rect:
+        serializedVersion: 2
+        x: 971
+        y: 616
+        width: 44
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37e5acd71d41ab240800000000000000
+      internalID: 4808178442162560627
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_7
+      rect:
+        serializedVersion: 2
+        x: 1090
+        y: 610
+        width: 35
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e12a3e97300caa00800000000000000
+      internalID: 768989875251323367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_8
+      rect:
+        serializedVersion: 2
+        x: 1207
+        y: 626
+        width: 17
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5494b44331e983b60800000000000000
+      internalID: 7726098966073002309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_9
+      rect:
+        serializedVersion: 2
+        x: 1448
+        y: 626
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 889890b44fbdfbee0800000000000000
+      internalID: -1243033129853548152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_10
+      rect:
+        serializedVersion: 2
+        x: 1931
+        y: 628
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d11fc8157ac7355e0800000000000000
+      internalID: -1922055557887495907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_11
+      rect:
+        serializedVersion: 2
+        x: 1937
+        y: 626
+        width: 188
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93d1d1d5b512d2e60800000000000000
+      internalID: 7939038394411982137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_12
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 610
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97c4072b3e53800c0800000000000000
+      internalID: -4609374966546150279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_13
+      rect:
+        serializedVersion: 2
+        x: 987
+        y: 607
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c413e6ecc0b49c00800000000000000
+      internalID: 906543819101770946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_14
+      rect:
+        serializedVersion: 2
+        x: 1768
+        y: 612
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c5821a10c4a1b200800000000000000
+      internalID: 194117403931739585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_15
+      rect:
+        serializedVersion: 2
+        x: 1939
+        y: 596
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94859e690d1cde670800000000000000
+      internalID: 8569718767585155145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_16
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 594
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7767620df0be4e80800000000000000
+      internalID: -8192416071426807940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy neon cyberpunk lift platform_17
+      rect:
+        serializedVersion: 2
+        x: 981
+        y: 602
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83e3658729aba3260800000000000000
+      internalID: 7078174902613065272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Icy neon cyberpunk lift platform_0: 5671958950546608477
+      Icy neon cyberpunk lift platform_1: 975305997000116770
+      Icy neon cyberpunk lift platform_10: -1922055557887495907
+      Icy neon cyberpunk lift platform_11: 7939038394411982137
+      Icy neon cyberpunk lift platform_12: -4609374966546150279
+      Icy neon cyberpunk lift platform_13: 906543819101770946
+      Icy neon cyberpunk lift platform_14: 194117403931739585
+      Icy neon cyberpunk lift platform_15: 8569718767585155145
+      Icy neon cyberpunk lift platform_16: -8192416071426807940
+      Icy neon cyberpunk lift platform_17: 7078174902613065272
+      Icy neon cyberpunk lift platform_2: 187648231191255170
+      Icy neon cyberpunk lift platform_3: 8172357467238757217
+      Icy neon cyberpunk lift platform_4: 2698311072587997677
+      Icy neon cyberpunk lift platform_5: 5980239625488476855
+      Icy neon cyberpunk lift platform_6: 4808178442162560627
+      Icy neon cyberpunk lift platform_7: 768989875251323367
+      Icy neon cyberpunk lift platform_8: 7726098966073002309
+      Icy neon cyberpunk lift platform_9: -1243033129853548152
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

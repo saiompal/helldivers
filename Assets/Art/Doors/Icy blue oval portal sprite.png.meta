@@ -1,0 +1,1690 @@
+fileFormatVersion: 2
+guid: a69ae2b1a5ba163478267df2532cc06c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 217941601551058323
+    second: Icy blue oval portal sprite_0
+  - first:
+      213: 7998009106805795551
+    second: Icy blue oval portal sprite_1
+  - first:
+      213: 5323580859256833704
+    second: Icy blue oval portal sprite_2
+  - first:
+      213: -1401978461825992825
+    second: Icy blue oval portal sprite_3
+  - first:
+      213: 1219232515408680394
+    second: Icy blue oval portal sprite_4
+  - first:
+      213: -8198614806597780617
+    second: Icy blue oval portal sprite_5
+  - first:
+      213: -5002916407991964104
+    second: Icy blue oval portal sprite_6
+  - first:
+      213: 895138265022900256
+    second: Icy blue oval portal sprite_7
+  - first:
+      213: 6049598910796235814
+    second: Icy blue oval portal sprite_8
+  - first:
+      213: -2344070617779899027
+    second: Icy blue oval portal sprite_9
+  - first:
+      213: 7872682961908014475
+    second: Icy blue oval portal sprite_10
+  - first:
+      213: 3256077036950821588
+    second: Icy blue oval portal sprite_11
+  - first:
+      213: 8538199775199196834
+    second: Icy blue oval portal sprite_12
+  - first:
+      213: -4913510202226287725
+    second: Icy blue oval portal sprite_13
+  - first:
+      213: -5134125585907683101
+    second: Icy blue oval portal sprite_14
+  - first:
+      213: 7893796298360986143
+    second: Icy blue oval portal sprite_15
+  - first:
+      213: 320951257719795958
+    second: Icy blue oval portal sprite_16
+  - first:
+      213: 8885213585703757294
+    second: Icy blue oval portal sprite_17
+  - first:
+      213: 5843097821769319970
+    second: Icy blue oval portal sprite_18
+  - first:
+      213: -1581033512257589990
+    second: Icy blue oval portal sprite_19
+  - first:
+      213: 2532231313779747694
+    second: Icy blue oval portal sprite_20
+  - first:
+      213: -995251014060524030
+    second: Icy blue oval portal sprite_21
+  - first:
+      213: 5572591728325580184
+    second: Icy blue oval portal sprite_22
+  - first:
+      213: 4929518123470487617
+    second: Icy blue oval portal sprite_23
+  - first:
+      213: 2202086028903409201
+    second: Icy blue oval portal sprite_24
+  - first:
+      213: 872779676389102551
+    second: Icy blue oval portal sprite_25
+  - first:
+      213: -8573608517195488706
+    second: Icy blue oval portal sprite_26
+  - first:
+      213: -3957962969414486155
+    second: Icy blue oval portal sprite_27
+  - first:
+      213: 3480212591268530637
+    second: Icy blue oval portal sprite_28
+  - first:
+      213: -366131373675142790
+    second: Icy blue oval portal sprite_29
+  - first:
+      213: -3157523362352930103
+    second: Icy blue oval portal sprite_30
+  - first:
+      213: -3899363465985482449
+    second: Icy blue oval portal sprite_31
+  - first:
+      213: 1770540518524523243
+    second: Icy blue oval portal sprite_32
+  - first:
+      213: 2315983425152859304
+    second: Icy blue oval portal sprite_33
+  - first:
+      213: 830719920239281686
+    second: Icy blue oval portal sprite_34
+  - first:
+      213: -4436016328736676259
+    second: Icy blue oval portal sprite_35
+  - first:
+      213: -3164979139960224033
+    second: Icy blue oval portal sprite_36
+  - first:
+      213: -763201878375100991
+    second: Icy blue oval portal sprite_37
+  - first:
+      213: 3920143770865964426
+    second: Icy blue oval portal sprite_38
+  - first:
+      213: -8018538686622902993
+    second: Icy blue oval portal sprite_39
+  - first:
+      213: 781307382432272020
+    second: Icy blue oval portal sprite_40
+  - first:
+      213: -7899268067074339046
+    second: Icy blue oval portal sprite_41
+  - first:
+      213: -4893048392076060539
+    second: Icy blue oval portal sprite_42
+  - first:
+      213: 2394408159769466604
+    second: Icy blue oval portal sprite_43
+  - first:
+      213: 3469095814595856771
+    second: Icy blue oval portal sprite_44
+  - first:
+      213: -2462135157497958180
+    second: Icy blue oval portal sprite_45
+  - first:
+      213: -6053619022134706362
+    second: Icy blue oval portal sprite_46
+  - first:
+      213: -5640857798957826820
+    second: Icy blue oval portal sprite_47
+  - first:
+      213: -4917628074641320312
+    second: Icy blue oval portal sprite_48
+  - first:
+      213: -7963986094920952291
+    second: Icy blue oval portal sprite_49
+  - first:
+      213: -5685179858549341825
+    second: Icy blue oval portal sprite_50
+  - first:
+      213: -1749096943943961290
+    second: Icy blue oval portal sprite_51
+  - first:
+      213: 1997806944419871833
+    second: Icy blue oval portal sprite_52
+  - first:
+      213: 4906865420586509902
+    second: Icy blue oval portal sprite_53
+  - first:
+      213: 7942645599631689727
+    second: Icy blue oval portal sprite_54
+  - first:
+      213: -530573365338879147
+    second: Icy blue oval portal sprite_55
+  - first:
+      213: 1641806960968428498
+    second: Icy blue oval portal sprite_56
+  - first:
+      213: 7263383620333966735
+    second: Icy blue oval portal sprite_57
+  - first:
+      213: 3795730826994729977
+    second: Icy blue oval portal sprite_58
+  - first:
+      213: 5361934540949908097
+    second: Icy blue oval portal sprite_59
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_0
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1421
+        width: 131
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3950b3e5bb8460300800000000000000
+      internalID: 217941601551058323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_1
+      rect:
+        serializedVersion: 2
+        x: 604
+        y: 1485
+        width: 23
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdaaf7948e2aefe60800000000000000
+      internalID: 7998009106805795551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_2
+      rect:
+        serializedVersion: 2
+        x: 624
+        y: 1457
+        width: 51
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a68211069821e940800000000000000
+      internalID: 5323580859256833704
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_3
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 1467
+        width: 23
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 787fc18540c2b8ce0800000000000000
+      internalID: -1401978461825992825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_4
+      rect:
+        serializedVersion: 2
+        x: 668
+        y: 1425
+        width: 85
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac55a8353859be010800000000000000
+      internalID: 1219232515408680394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_5
+      rect:
+        serializedVersion: 2
+        x: 668
+        y: 1461
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77b3b72854ba83e80800000000000000
+      internalID: -8198614806597780617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_6
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 1377
+        width: 105
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83e6aa49802129ab0800000000000000
+      internalID: -5002916407991964104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_7
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 1436
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 028ac87628b2c6c00800000000000000
+      internalID: 895138265022900256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_8
+      rect:
+        serializedVersion: 2
+        x: 310
+        y: 1414
+        width: 21
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 624899f382e74f350800000000000000
+      internalID: 6049598910796235814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_9
+      rect:
+        serializedVersion: 2
+        x: 582
+        y: 1431
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d657cca4130387fd0800000000000000
+      internalID: -2344070617779899027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_10
+      rect:
+        serializedVersion: 2
+        x: 598
+        y: 1425
+        width: 57
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8d1ccd4173614d60800000000000000
+      internalID: 7872682961908014475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_11
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 963
+        height: 1429
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4da92cc40d8ef2d20800000000000000
+      internalID: 3256077036950821588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_12
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 1415
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a6711e4577cd7670800000000000000
+      internalID: 8538199775199196834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_13
+      rect:
+        serializedVersion: 2
+        x: 632
+        y: 1409
+        width: 15
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39b5b040184bfcbb0800000000000000
+      internalID: -4913510202226287725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_14
+      rect:
+        serializedVersion: 2
+        x: 708
+        y: 1407
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e07abb3bfbefb8b0800000000000000
+      internalID: -5134125585907683101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_15
+      rect:
+        serializedVersion: 2
+        x: 734
+        y: 1319
+        width: 97
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1a991509e56c8d60800000000000000
+      internalID: 7893796298360986143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_16
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 1262
+        width: 15
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f07a9ae77f347400800000000000000
+      internalID: 320951257719795958
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_17
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 1265
+        width: 29
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee5e8592eae9e4b70800000000000000
+      internalID: 8885213585703757294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_18
+      rect:
+        serializedVersion: 2
+        x: 822
+        y: 1204
+        width: 85
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2264b66c28ad61150800000000000000
+      internalID: 5843097821769319970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_19
+      rect:
+        serializedVersion: 2
+        x: 886
+        y: 1203
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1de5e3b56a0f0ae0800000000000000
+      internalID: -1581033512257589990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_20
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 1167
+        width: 17
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6b66faa6fa442320800000000000000
+      internalID: 2532231313779747694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_21
+      rect:
+        serializedVersion: 2
+        x: 942
+        y: 1127
+        width: 45
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20e339cc9782032f0800000000000000
+      internalID: -995251014060524030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_22
+      rect:
+        serializedVersion: 2
+        x: 992
+        y: 1119
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 895502de6a2d55d40800000000000000
+      internalID: 5572591728325580184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_23
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 1087
+        width: 14
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1400f479d9a296440800000000000000
+      internalID: 4929518123470487617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_24
+      rect:
+        serializedVersion: 2
+        x: 926
+        y: 1027
+        width: 83
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13663ad73916f8e10800000000000000
+      internalID: 2202086028903409201
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_25
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1062
+        width: 5
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d35a52dd7cbc1c00800000000000000
+      internalID: 872779676389102551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_26
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 517
+        width: 9
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e32ac418a7c640980800000000000000
+      internalID: -8573608517195488706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_27
+      rect:
+        serializedVersion: 2
+        x: 944
+        y: 509
+        width: 47
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57736e546ad7219c0800000000000000
+      internalID: -3957962969414486155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_28
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 495
+        width: 5
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc9076da9e23c4030800000000000000
+      internalID: 3480212591268530637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_29
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 485
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a71a7fa947d3beaf0800000000000000
+      internalID: -366131373675142790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_30
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 463
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c2e4f03b393e24d0800000000000000
+      internalID: -3157523362352930103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_31
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 453
+        width: 16
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f21accf569da2e9c0800000000000000
+      internalID: -3899363465985482449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_32
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 463
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be2171b8839329810800000000000000
+      internalID: 1770540518524523243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_33
+      rect:
+        serializedVersion: 2
+        x: 46
+        y: 428
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8acbde197a6042020800000000000000
+      internalID: 2315983425152859304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_34
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 429
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61604b9bd5f478b00800000000000000
+      internalID: 830719920239281686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_35
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 438
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5661dbe6aa1072c0800000000000000
+      internalID: -4436016328736676259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_36
+      rect:
+        serializedVersion: 2
+        x: 910
+        y: 429
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd64621bd3cb314d0800000000000000
+      internalID: -3164979139960224033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_37
+      rect:
+        serializedVersion: 2
+        x: 974
+        y: 407
+        width: 25
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cd8a8b6fef8865f0800000000000000
+      internalID: -763201878375100991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_38
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 389
+        width: 33
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a851de26df5276630800000000000000
+      internalID: 3920143770865964426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_39
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 404
+        width: 17
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f255d1e6c8d68b090800000000000000
+      internalID: -8018538686622902993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_40
+      rect:
+        serializedVersion: 2
+        x: 926
+        y: 407
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49e044ebce2c7da00800000000000000
+      internalID: 781307382432272020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_41
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 315
+        width: 56
+        height: 85
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1f827c8b89206290800000000000000
+      internalID: -7899268067074339046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_42
+      rect:
+        serializedVersion: 2
+        x: 244
+        y: 133
+        width: 33
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58892817966681cb0800000000000000
+      internalID: -4893048392076060539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_43
+      rect:
+        serializedVersion: 2
+        x: 718
+        y: 164
+        width: 29
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce61b520985aa3120800000000000000
+      internalID: 2394408159769466604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_44
+      rect:
+        serializedVersion: 2
+        x: 271
+        y: 142
+        width: 24
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 389c7c86344b42030800000000000000
+      internalID: 3469095814595856771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_45
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 129
+        width: 19
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd075548e1db4ddd0800000000000000
+      internalID: -2462135157497958180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_46
+      rect:
+        serializedVersion: 2
+        x: 764
+        y: 141
+        width: 13
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64ffc14a2993dfba0800000000000000
+      internalID: -6053619022134706362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_47
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 93
+        width: 33
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfc70a8e7b5a7b1b0800000000000000
+      internalID: -5640857798957826820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_48
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 110
+        width: 35
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8861481225311cbb0800000000000000
+      internalID: -4917628074641320312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_49
+      rect:
+        serializedVersion: 2
+        x: 680
+        y: 77
+        width: 29
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d16161877dc3a7190800000000000000
+      internalID: -7963986094920952291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_50
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 81
+        width: 19
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7106fe3a0f2a11b0800000000000000
+      internalID: -5685179858549341825
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_51
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 85
+        width: 15
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 635bf7ab895f9b7e0800000000000000
+      internalID: -1749096943943961290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_52
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 85
+        width: 20
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95c74f3c4d2a9bb10800000000000000
+      internalID: 1997806944419871833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_53
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 79
+        width: 17
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e46e4b23a10b81440800000000000000
+      internalID: 4906865420586509902
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_54
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 77
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff7cdd64712f93e60800000000000000
+      internalID: 7942645599631689727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_55
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 61
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55b41b7d55603a8f0800000000000000
+      internalID: -530573365338879147
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_56
+      rect:
+        serializedVersion: 2
+        x: 634
+        y: 47
+        width: 21
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2db694a7bbed8c610800000000000000
+      internalID: 1641806960968428498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_57
+      rect:
+        serializedVersion: 2
+        x: 662
+        y: 63
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f85956d6be8bcc460800000000000000
+      internalID: 7263383620333966735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_58
+      rect:
+        serializedVersion: 2
+        x: 556
+        y: 37
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f3450693152da430800000000000000
+      internalID: 3795730826994729977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icy blue oval portal sprite_59
+      rect:
+        serializedVersion: 2
+        x: 592
+        y: 31
+        width: 41
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18a67366e0b696a40800000000000000
+      internalID: 5361934540949908097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Icy blue oval portal sprite_0: 217941601551058323
+      Icy blue oval portal sprite_1: 7998009106805795551
+      Icy blue oval portal sprite_10: 7872682961908014475
+      Icy blue oval portal sprite_11: 3256077036950821588
+      Icy blue oval portal sprite_12: 8538199775199196834
+      Icy blue oval portal sprite_13: -4913510202226287725
+      Icy blue oval portal sprite_14: -5134125585907683101
+      Icy blue oval portal sprite_15: 7893796298360986143
+      Icy blue oval portal sprite_16: 320951257719795958
+      Icy blue oval portal sprite_17: 8885213585703757294
+      Icy blue oval portal sprite_18: 5843097821769319970
+      Icy blue oval portal sprite_19: -1581033512257589990
+      Icy blue oval portal sprite_2: 5323580859256833704
+      Icy blue oval portal sprite_20: 2532231313779747694
+      Icy blue oval portal sprite_21: -995251014060524030
+      Icy blue oval portal sprite_22: 5572591728325580184
+      Icy blue oval portal sprite_23: 4929518123470487617
+      Icy blue oval portal sprite_24: 2202086028903409201
+      Icy blue oval portal sprite_25: 872779676389102551
+      Icy blue oval portal sprite_26: -8573608517195488706
+      Icy blue oval portal sprite_27: -3957962969414486155
+      Icy blue oval portal sprite_28: 3480212591268530637
+      Icy blue oval portal sprite_29: -366131373675142790
+      Icy blue oval portal sprite_3: -1401978461825992825
+      Icy blue oval portal sprite_30: -3157523362352930103
+      Icy blue oval portal sprite_31: -3899363465985482449
+      Icy blue oval portal sprite_32: 1770540518524523243
+      Icy blue oval portal sprite_33: 2315983425152859304
+      Icy blue oval portal sprite_34: 830719920239281686
+      Icy blue oval portal sprite_35: -4436016328736676259
+      Icy blue oval portal sprite_36: -3164979139960224033
+      Icy blue oval portal sprite_37: -763201878375100991
+      Icy blue oval portal sprite_38: 3920143770865964426
+      Icy blue oval portal sprite_39: -8018538686622902993
+      Icy blue oval portal sprite_4: 1219232515408680394
+      Icy blue oval portal sprite_40: 781307382432272020
+      Icy blue oval portal sprite_41: -7899268067074339046
+      Icy blue oval portal sprite_42: -4893048392076060539
+      Icy blue oval portal sprite_43: 2394408159769466604
+      Icy blue oval portal sprite_44: 3469095814595856771
+      Icy blue oval portal sprite_45: -2462135157497958180
+      Icy blue oval portal sprite_46: -6053619022134706362
+      Icy blue oval portal sprite_47: -5640857798957826820
+      Icy blue oval portal sprite_48: -4917628074641320312
+      Icy blue oval portal sprite_49: -7963986094920952291
+      Icy blue oval portal sprite_5: -8198614806597780617
+      Icy blue oval portal sprite_50: -5685179858549341825
+      Icy blue oval portal sprite_51: -1749096943943961290
+      Icy blue oval portal sprite_52: 1997806944419871833
+      Icy blue oval portal sprite_53: 4906865420586509902
+      Icy blue oval portal sprite_54: 7942645599631689727
+      Icy blue oval portal sprite_55: -530573365338879147
+      Icy blue oval portal sprite_56: 1641806960968428498
+      Icy blue oval portal sprite_57: 7263383620333966735
+      Icy blue oval portal sprite_58: 3795730826994729977
+      Icy blue oval portal sprite_59: 5361934540949908097
+      Icy blue oval portal sprite_6: -5002916407991964104
+      Icy blue oval portal sprite_7: 895138265022900256
+      Icy blue oval portal sprite_8: 6049598910796235814
+      Icy blue oval portal sprite_9: -2344070617779899027
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
