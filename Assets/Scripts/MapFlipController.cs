@@ -61,6 +61,9 @@ public class MapFlipController : MonoBehaviour
     };
 
     public event Action Flipped;
+    public event Action TurnStarted;
+    public event Action<Vector3, Quaternion> TurnPoseApplied;
+    public event Action TurnFinished;
 
     private Vector3 pivot;
     private Quaternion turnStartRotation;
@@ -101,7 +104,7 @@ public class MapFlipController : MonoBehaviour
         CurrentPhase = Phase.Counting;
     }
 
-    // Skips the wait and starts the red warning immediately.
+    // Skips the wait and starts the red warning now. Used by the tutorial.
     public void FlipSoon()
     {
         if (enabled && CurrentPhase == Phase.Counting)
@@ -193,6 +196,9 @@ public class MapFlipController : MonoBehaviour
         turnStartRotation = mapRoot.rotation;
         CurrentPhase = Phase.Turning;
         elapsed = 0f;
+
+        // 通知分身记录位置并暂停物理。
+        TurnStarted?.Invoke();
     }
 
     private void AnimateTurn()
@@ -219,6 +225,9 @@ public class MapFlipController : MonoBehaviour
         player.transform.position = new Vector3(
             position.x, position.y, player.transform.position.z
         );
+
+        // 分身使用相同的旋转中心和旋转角度。
+        TurnPoseApplied?.Invoke(pivot, delta);
     }
 
     private void FinishTurn()
@@ -232,6 +241,14 @@ public class MapFlipController : MonoBehaviour
         player.position = end;
         player.simulated = true;
         player.interpolation = normalInterpolation;
+
+        // 将分身放到精确的翻转终点，再恢复它的物理。
+        TurnPoseApplied?.Invoke(
+            pivot,
+            Quaternion.Euler(0f, 0f, 180f)
+        );
+        TurnFinished?.Invoke();
+
         Physics2D.SyncTransforms();
 
         FlipCount++;
